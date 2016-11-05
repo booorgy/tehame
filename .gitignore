@@ -1,5 +1,6 @@
 /target/
+/docker/logs/
+*.war
 *.zip
 *.class
 *.log
-*.war

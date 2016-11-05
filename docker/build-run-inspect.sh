@@ -2,7 +2,14 @@
 
 clear
 
-rm tehame.war
+if [ ! -f Dockerfile ]
+then 
+	echo "Dockerfile nicht gefunden, falsches Verzeichnis?"
+    exit 1
+fi
+
+mkdir -p logs
+rm tehame.war 2> /dev/null
 
 cd ..
 
