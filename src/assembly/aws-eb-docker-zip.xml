@@ -9,16 +9,18 @@
 
 	<includeBaseDirectory>false</includeBaseDirectory>
 
-	<fileSets>
-		<fileSet>
-			<directory>${project.basedir}/docker/</directory>
-			<outputDirectory>/</outputDirectory>
-			<useDefaultExcludes>true</useDefaultExcludes>
-		</fileSet>
-	</fileSets>
 	<files>
 		<file>
 			<source>${project.build.directory}/${project.name}.war</source>
+		</file>
+		<file>
+			<source>${project.basedir}/docker/standalone.xml</source>
+		</file>
+		<file>
+			<source>${project.basedir}/docker/module.xml</source>
+		</file>
+		<file>
+			<source>${project.basedir}/docker/Dockerfile</source>
 		</file>
 	</files>
 </assembly> 

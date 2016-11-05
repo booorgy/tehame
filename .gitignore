@@ -1,1 +1,5 @@
 /target/
+*.zip
+*.class
+*.log
+*.war
