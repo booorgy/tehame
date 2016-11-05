@@ -14,7 +14,7 @@ RUN yum -y install wget \
 
 COPY module.xml $JBOSS_HOME/modules/com/mysql/main/
 COPY standalone.xml $JBOSS_HOME/standalone/configuration/
-COPY tehame-0.0.1-SNAPSHOT.war $JBOSS_HOME/standalone/deployments/
+COPY tehame.war $JBOSS_HOME/standalone/deployments/
 
 USER jboss
 
