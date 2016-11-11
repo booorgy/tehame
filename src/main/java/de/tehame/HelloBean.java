@@ -21,7 +21,7 @@ public class HelloBean implements Serializable {
 
 	public String getName() {
 		
-	       MongoClientURI uri  = new MongoClientURI("mongodb://gude:gude8888@ds143777.mlab.com:43777/tehame"); 
+	       MongoClientURI uri  = new MongoClientURI("mongodb://gude1:moin!321@ds143777.mlab.com:43777/tehame"); 
 	        MongoClient client = new MongoClient(uri);
 	        DB db = client.getDB(uri.getDatabase());
 	        DBCollection songs = db.getCollection("testc");
