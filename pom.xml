@@ -33,6 +33,35 @@
 		<finalName>${project.name}</finalName>
 		<plugins>
 			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>1.0.2.Final</version>
+				<configuration>
+					<hostname>localhost</hostname>
+					<port>9990</port>
+					<filename>${project.name}.war</filename>
+				</configuration>
+				<executions>
+					<execution>
+						<id>undeploy</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>undeploy</goal>
+						</goals>
+						<configuration>
+							<ignoreMissingDeployment>true</ignoreMissingDeployment>
+						</configuration>
+					</execution>
+					<execution>
+						<id>deploy</id>
+						<phase>install</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 			  <artifactId>maven-assembly-plugin</artifactId>
 			  <version>2.6</version>
 			  <configuration>
@@ -54,46 +83,23 @@
 	</build>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-api</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-impl</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.el</groupId>
-			<artifactId>el-ri</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.9.6</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver</artifactId>
 			<version>3.3.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
