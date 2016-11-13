@@ -1,5 +1,6 @@
 package de.tehame.rs.v1;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -9,9 +10,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
+
+import de.tehame.metadata.MetadataBuilder;
 
 @Path("v1/photos")
 public class Photos {
@@ -30,24 +36,85 @@ public class Photos {
 		return id;
 	}
 	
-	// Beispiel: curl --data-binary ./img.jpg localhost:8080/tehame/v1/photos -v -H "Content-Type: image/jpeg" 
+	// Beispiel: curl localhost:8080/tehame/v1/photos -v -H "Content-Type: image/jpeg" --data-binary @"../../photos/trump.jpg"
+	// Das @ Zeichen definiert einen Pfad
 	@POST
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes("image/jpeg")
-	public String addPhoto(InputStream is) {
+	public String addPhoto(final InputStream is) {
+		
+		// TODO auth
+		// TODO prüfen, dass upload ein bild ist und nicht ausführbar
+		
+		final byte[] fileData = this.leseStream(is);
+		
+		if (fileData != null && fileData.length != 0) {
+			try {
+				MetadataBuilder.metadataExample(fileData);
+			} catch (ImageReadException e) {
+				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
+				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+			} catch (IOException e) {
+				LOGGER.error(e);
+				throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
+		}
+		
+		return "eine s3 id"; //TODO S3 id/url?
+	}
 
-		byte[] bytes = new byte[1024];
-		int readBytes = 0;
+	/**
+	 * Erstellt im Arbeitsspeicher ein Byte-Array aus dem InputStream.
+	 * 
+	 * @param is InputStream des Uploads.
+	 * @return ByteArray aus dem InputStream.
+	 */
+	private byte[] leseStream(final InputStream is) {
+		byte[] filedata = null;
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int anzBytes = 0;
+		int anzBytesTotal = 0;
+		boolean ioError = false;
 
 		try {
-			while ((readBytes = is.read(bytes)) != -1) {
-				LOGGER.trace(readBytes);
+			while ((anzBytes = is.read(buffer)) != -1) {
+				anzBytesTotal += anzBytes;
+				// TODO Maximale Größe limitieren
+				LOGGER.trace(anzBytes + " Bytes aus InputStream gelesen (" 
+						+ anzBytesTotal + " Bytes total)");
+				os.write(buffer, 0, anzBytes);
 			}
+			
+			os.flush();
+			filedata = os.toByteArray();
+			
 		} catch (IOException e) {
 			LOGGER.error(e);
+			ioError = true;
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				LOGGER.error(e);
+				ioError = true;
+			}
+			try {
+				is.close();
+			} catch (IOException e) {
+				LOGGER.error(e);
+				ioError = true;
+			}
 		}
-
-		return "eine id";
+		
+		if (ioError) {
+			throw new WebApplicationException("Internal I/O Error while processing upload", 
+					Response.Status.INTERNAL_SERVER_ERROR);
+		}
+		
+		return filedata;
 	}
 }
