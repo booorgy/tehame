@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,15 +37,17 @@ public class Photos {
 		return id;
 	}
 	
-	// Beispiel: curl localhost:8080/tehame/v1/photos -v -H "Content-Type: image/jpeg" --data-binary @"../../photos/trump.jpg"
+	// Beispiel: curl localhost:8080/tehame/v1/photos -v -H "Content-Type: image/jpeg" -H "email: gude@gude.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	// Das @ Zeichen definiert einen Pfad
 	@POST
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes("image/jpeg")
-	public String addPhoto(final InputStream is) {
+	public String addPhoto(final InputStream is, @HeaderParam("email") String email, @HeaderParam("passwort") String passwort) {
 		
 		// TODO auth
+		LOGGER.trace("email: " + email);
+		LOGGER.trace("passwort: " + passwort);
 		// TODO prüfen, dass upload ein bild ist und nicht ausführbar
 		
 		final byte[] fileData = this.leseStream(is);
