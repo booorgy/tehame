@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
+import de.tehame.UserBean;
 import de.tehame.entities.PhotoMetadaten;
 import de.tehame.metadata.MetadataBuilder;
 
@@ -25,6 +27,9 @@ import de.tehame.metadata.MetadataBuilder;
 public class Photos {
 	
 	private static final Logger LOGGER = Logger.getLogger(Photos.class);
+	
+	@Inject
+	UserBean userBean;
 
 	@GET
 	@Path("status")
@@ -49,25 +54,29 @@ public class Photos {
 		// TODO auth
 		LOGGER.trace("email: " + email);
 		LOGGER.trace("passwort: " + passwort);
-		// TODO prüfen, dass upload ein bild ist und nicht ausführbar
-		
-		final byte[] fileData = this.leseStream(is);
-		
-		if (fileData != null && fileData.length != 0) {
-			try {
-				final PhotoMetadaten photoMetadaten = MetadataBuilder.getMetaData(fileData);
-			} catch (ImageReadException e) {
-				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
-				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-			} catch (IOException e) {
-				LOGGER.error(e);
-				throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+		if (userBean.authUser(email, passwort)) {		
+			// TODO prüfen, dass upload ein bild ist und nicht ausführbar
+			
+			final byte[] fileData = this.leseStream(is);
+			
+			if (fileData != null && fileData.length != 0) {
+				try {
+					final PhotoMetadaten photoMetadaten = MetadataBuilder.getMetaData(fileData);
+				} catch (ImageReadException e) {
+					LOGGER.error("Das Bild konnte nicht geparsed werden."); 
+					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+				} catch (IOException e) {
+					LOGGER.error(e);
+					throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+				}
+			} else {
+				throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
 			}
+			
+			return "eine s3 id"; //TODO S3 id/url?
 		} else {
-			throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
+			throw new WebApplicationException( Response.Status.UNAUTHORIZED);
 		}
-		
-		return "eine s3 id"; //TODO S3 id/url?
 	}
 
 	/**
