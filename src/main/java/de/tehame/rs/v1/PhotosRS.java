@@ -19,17 +19,17 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
-import de.tehame.UserBean;
+import de.tehame.UserBeanMongoDB;
 import de.tehame.entities.PhotoMetadaten;
 import de.tehame.metadata.MetadataBuilder;
 
 @Path("v1/photos")
-public class Photos {
+public class PhotosRS {
 	
-	private static final Logger LOGGER = Logger.getLogger(Photos.class);
+	private static final Logger LOGGER = Logger.getLogger(PhotosRS.class);
 	
-	@Inject
-	UserBean userBean;
+//	@Inject
+//	UserBeanMongoDB userBean;
 
 	@GET
 	@Path("status")
@@ -54,7 +54,7 @@ public class Photos {
 		// TODO auth
 		LOGGER.trace("email: " + email);
 		LOGGER.trace("passwort: " + passwort);
-		if (userBean.authUser(email, passwort)) {		
+		if (true /*userBean.authUser(email, passwort)*/) {		
 			// TODO prüfen, dass upload ein bild ist und nicht ausführbar
 			
 			final byte[] fileData = this.leseStream(is);

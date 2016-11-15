@@ -143,7 +143,7 @@
         <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:4.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/TestDS" pool-name="TestDS" enabled="true">
+                <datasource jndi-name="java:jboss/datasources/${env.RDS_DB_NAME}DS" pool-name="${env.RDS_DB_NAME}DS" enabled="true">
                     <connection-url>jdbc:mysql://${env.RDS_HOSTNAME}:${env.RDS_PORT}/${env.RDS_DB_NAME}</connection-url>
                     <driver-class>com.mysql.jdbc.Driver</driver-class>
                     <driver>mysql</driver>

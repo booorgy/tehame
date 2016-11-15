@@ -1,28 +1,20 @@
 package de.tehame;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
+import de.tehame.entities.User;
+
+@Stateless
+@LocalBean
 public class UserBean {
 
-	public boolean authUser(String email, String passwort) {
-	   	MongoClientURI uri  = new MongoClientURI(Properties.MONGO_URL); 
-	    MongoClient client = new MongoClient(uri);
-	    DB db = client.getDB(uri.getDatabase());
-	    DBCollection users = db.getCollection("user");
-	    BasicDBObject query = new BasicDBObject();
-	    query.put("email", email);
-	    query.put("passwort", passwort);
-	    DBCursor cursor = users.find(query);
-		
-	    if(cursor.size() == 1) {
-	    	return true;
-	    } else {
-		    return false;	    	
-	    }
+	@PersistenceContext(unitName = "tehamePU")
+	private EntityManager em;
+	
+	public void persist(User user) {
+		this.em.persist(user);
 	}
 }
