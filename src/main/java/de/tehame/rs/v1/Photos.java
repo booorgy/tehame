@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
+import de.tehame.entities.PhotoMetadaten;
 import de.tehame.metadata.MetadataBuilder;
 
 @Path("v1/photos")
@@ -54,7 +55,7 @@ public class Photos {
 		
 		if (fileData != null && fileData.length != 0) {
 			try {
-				MetadataBuilder.metadataExample(fileData);
+				final PhotoMetadaten photoMetadaten = MetadataBuilder.getMetaData(fileData);
 			} catch (ImageReadException e) {
 				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);

@@ -16,12 +16,21 @@ import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.jboss.logging.Logger;
 
+import de.tehame.entities.PhotoMetadaten;
+
 public class MetadataBuilder {
 
 	private static final Logger LOGGER = Logger.getLogger(MetadataBuilder.class);
 
-	public static void metadataExample(final byte[] fileData) throws ImageReadException, IOException {
-
+	public static PhotoMetadaten getMetaData(final byte[] fileData) 
+			throws ImageReadException, IOException {
+		
+		String dateTimeOriginal = null; 
+		double longitude = -1; 
+		double latitude = -1;
+		int breite = -1;
+		int hoehe = -1;
+		
 		// Greife auf die Metadaten zu, die im Exif-Format gespeichert werden.
 		// Siehe Wikipedia: https://de.wikipedia.org/wiki/Exchangeable_Image_File_Format 
 		final ImageMetadata metadata = Imaging.getMetadata(fileData);
@@ -52,6 +61,38 @@ public class MetadataBuilder {
 			logTagValue(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_LATITUDE);
 			logTagValue(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_LONGITUDE_REF);
 			logTagValue(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_LONGITUDE);
+			
+			// Die Breite des Bildes.
+			final TiffField tiffFieldWidth = jpegMetadata.findEXIFValueWithExactMatch(
+					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH);
+			
+			if (tiffFieldWidth != null) {
+				try {
+					breite = Integer.parseInt(tiffFieldWidth.getValueDescription());
+				} catch (NumberFormatException e) {
+					LOGGER.error(e);
+				}
+			}
+			
+			// Die Höhe des Bildes.
+			final TiffField tiffFieldLength = jpegMetadata.findEXIFValueWithExactMatch(
+					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH);
+			
+			if (tiffFieldLength != null) {
+				try {
+					hoehe = Integer.parseInt(tiffFieldLength.getValueDescription());
+				} catch (NumberFormatException e) {
+					LOGGER.error(e);
+				}
+			}
+			
+			// Das Aufnahmedatum.
+			final TiffField tiffFieldDateTimeOriginal = jpegMetadata.findEXIFValueWithExactMatch(
+					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+			
+			if (tiffFieldDateTimeOriginal != null) {
+				dateTimeOriginal = tiffFieldDateTimeOriginal.getValueDescription();
+			}
 
 			// simple interface to GPS data
 			final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
@@ -59,8 +100,8 @@ public class MetadataBuilder {
 				final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
 				if (null != gpsInfo) {
 					final String gpsDescription = gpsInfo.toString();
-					final double longitude = gpsInfo.getLongitudeAsDegreesEast();
-					final double latitude = gpsInfo.getLatitudeAsDegreesNorth();
+					longitude = gpsInfo.getLongitudeAsDegreesEast();
+					latitude = gpsInfo.getLatitudeAsDegreesNorth();
 
 					LOGGER.trace("GPS Description: " + gpsDescription);
 					LOGGER.trace("GPS Longitude (Degrees East): " + longitude);
@@ -74,6 +115,10 @@ public class MetadataBuilder {
 				LOGGER.trace("    " + "item: " + item);
 			}
 		}
+		
+		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe);
+		LOGGER.trace(metaDaten);
+		return metaDaten;
 	}
 
 	private static void logTagValue(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
