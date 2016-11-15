@@ -1,6 +1,10 @@
 package de.tehame.metadata;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 
 import org.apache.commons.imaging.ImageReadException;
@@ -131,5 +135,16 @@ public class MetadataBuilder {
 			LOGGER.trace(tagInfo.name + ": " + field.getValueDescription());
 		}
 	}
+	
+    public static File createJsonPhotoMetadatenFile(final PhotoMetadaten photoMetadaten) throws IOException {
+        File file = File.createTempFile("aws-java-sdk-", ".txt");
+        file.deleteOnExit();
+
+        Writer writer = new OutputStreamWriter(new FileOutputStream(file));
+        writer.write(photoMetadaten.toString());
+        writer.close();
+
+        return file;
+    }
 
 }
