@@ -22,6 +22,7 @@ import org.jboss.logging.Logger;
 import de.tehame.UserBean;
 import de.tehame.entities.PhotoMetadaten;
 import de.tehame.metadata.MetadataBuilder;
+import de.tehame.metadata.MetadatenBean;
 
 @Path("v1/photos")
 public class Photos {
@@ -30,6 +31,9 @@ public class Photos {
 	
 	@Inject
 	UserBean userBean;
+	
+	@Inject
+	MetadatenBean metaDatenBean;
 
 	@GET
 	@Path("status")
@@ -61,7 +65,7 @@ public class Photos {
 			
 			if (fileData != null && fileData.length != 0) {
 				try {
-					final PhotoMetadaten photoMetadaten = MetadataBuilder.getMetaData(fileData);
+					metaDatenBean.saveImageToS3andMongo(fileData, email);
 				} catch (ImageReadException e) {
 					LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
