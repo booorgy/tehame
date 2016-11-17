@@ -1,28 +1,36 @@
 package de.tehame.user;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * JPA Entity für MySQL DB.
+ * Der Tabellen-Name muss angegeben werden, 
+ * weil unter Linux die Groß-/Kleinschreibung relevant ist. 
+ */
 @Entity(name = "user")
 public class User implements Serializable {
 	private static final long serialVersionUID = 7914795743794418063L;
-	
+
+	/**
+	 * Die Verwendung einer UUID macht es einfacher,
+	 * weil die von der DB generierte ID nicht ermittelt werden muss.
+	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private String uuid;
 	private String email;
 	private String passwort;
 	
 	public User() { super(); }
 	
-	public User(String email, String passwort) {
+	public User(String email, String passwort, UUID uuid) {
 		super();
 		this.email = email;
 		this.passwort = passwort;
+		this.setUuid(uuid.toString());
 	}
 	
 	public String getEmail() {
@@ -37,11 +45,10 @@ public class User implements Serializable {
 	public void setPasswort(String passwort) {
 		this.passwort = passwort;
 	}
-	public int getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}	
 }
