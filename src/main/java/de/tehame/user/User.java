@@ -1,4 +1,4 @@
-package de.tehame.entities;
+package de.tehame.user;
 
 import java.io.Serializable;
 

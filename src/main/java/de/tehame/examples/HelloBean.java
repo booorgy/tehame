@@ -1,4 +1,4 @@
-package de.tehame;
+package de.tehame.examples;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;

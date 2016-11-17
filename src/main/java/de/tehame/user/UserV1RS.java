@@ -1,4 +1,4 @@
-package de.tehame.rs.v1;
+package de.tehame.user;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,17 +21,15 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
-import de.tehame.UserBean;
-import de.tehame.UserBeanMongoDB;
-import de.tehame.entities.PhotoMetadaten;
-import de.tehame.entities.User;
-import de.tehame.metadata.MetadataBuilder;
+import de.tehame.examples.UserBeanMongoDB;
+import de.tehame.photo.meta.MetadataBuilder;
+import de.tehame.photo.meta.PhotoMetadaten;
 
 @Path("v1/user")
 @Stateless
-public class UserRS {
+public class UserV1RS {
 	
-	private static final Logger LOGGER = Logger.getLogger(UserRS.class);
+	private static final Logger LOGGER = Logger.getLogger(UserV1RS.class);
 	
 	@EJB
 	private UserBean userBean;

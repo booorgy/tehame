@@ -1,4 +1,4 @@
-package de.tehame.metadata;
+package de.tehame.photo.meta;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,8 +19,6 @@ import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.jboss.logging.Logger;
-
-import de.tehame.entities.PhotoMetadaten;
 
 public class MetadataBuilder {
 

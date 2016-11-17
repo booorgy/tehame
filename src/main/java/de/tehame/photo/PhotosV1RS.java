@@ -1,4 +1,4 @@
-package de.tehame.rs.v1;
+package de.tehame.photo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,15 +19,15 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
-import de.tehame.UserBean;
-import de.tehame.entities.PhotoMetadaten;
-import de.tehame.metadata.MetadataBuilder;
-import de.tehame.metadata.MetadatenBean;
+import de.tehame.photo.meta.MetadataBuilder;
+import de.tehame.photo.meta.MetadatenBean;
+import de.tehame.photo.meta.PhotoMetadaten;
+import de.tehame.user.UserBean;
 
 @Path("v1/photos")
-public class Photos {
+public class PhotosV1RS {
 	
-	private static final Logger LOGGER = Logger.getLogger(Photos.class);
+	private static final Logger LOGGER = Logger.getLogger(PhotosV1RS.class);
 	
 	@Inject
 	UserBean userBean;

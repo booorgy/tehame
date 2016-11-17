@@ -1,11 +1,9 @@
-package de.tehame;
+package de.tehame.user;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
-import de.tehame.entities.User;
 
 @Stateless
 @LocalBean

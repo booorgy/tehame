@@ -6,6 +6,6 @@ import javax.ws.rs.core.Application;
 
 @ApplicationPath("tehame")
 @WebServlet("/*")
-public class Tehame extends Application {
+public class TehameRS extends Application {
 
 }

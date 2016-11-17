@@ -1,4 +1,4 @@
-package de.tehame.metadata;
+package de.tehame.photo.meta;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import de.tehame.Properties;
-import de.tehame.entities.PhotoMetadaten;
 
 public class MetadatenBean {
 	private static final Logger LOGGER = Logger.getLogger(MetadatenBean.class);

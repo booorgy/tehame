@@ -1,4 +1,4 @@
-package de.tehame.entities;
+package de.tehame.photo.meta;
 
 public class PhotoMetadaten {
 	
