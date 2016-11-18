@@ -3,11 +3,9 @@ package de.tehame.user;
 import java.util.UUID;
 
 import javax.ejb.EJB;
-import javax.ejb.EJBTransactionRolledbackException;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.transaction.TransactionScoped;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
