@@ -1,7 +1,5 @@
 package de.tehame.user;
 
-import java.util.UUID;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -45,7 +43,7 @@ public class UserV1RS {
 	@Produces(MediaType.TEXT_PLAIN)
 	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public String register(@HeaderParam("email") String email, @HeaderParam("passwort") String passwort) {
-		User user = new User(email, passwort, UUID.randomUUID());
+		User user = new User(email, passwort);
 		
 		// TODO Validierung EMail Syntax, Passwort Constraints
 		// TODO Mail senden zur Bestätigung

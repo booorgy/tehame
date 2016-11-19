@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.jboss.crypto.CryptoUtil;
+
 /**
  * JPA Entity für MySQL DB.
  * Der Tabellen-Name muss angegeben werden, 
@@ -24,13 +26,22 @@ public class User implements Serializable {
 	private String email;
 	private String passwort;
 	
+	/**
+	 * Default Constructor für JPA.
+	 */
 	public User() { super(); }
 	
-	public User(String email, String passwort, UUID uuid) {
+	/**
+	 * Instanziert eine neue User Entity.
+	 * 
+	 * @param email EMail.
+	 * @param passwort Unverschlüsseltes Passwort.
+	 */
+	public User(String email, String passwort) {
 		super();
 		this.email = email;
-		this.passwort = passwort;
-		this.setUuid(uuid.toString());
+		this.passwort = CryptoUtil.createPasswordHash("SHA-256", "base64", null, null, passwort);
+		this.setUuid(UUID.randomUUID().toString());
 	}
 	
 	public String getEmail() {
