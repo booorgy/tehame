@@ -31,7 +31,7 @@ public class UserV1RS {
 	
 	/**
 	 * Registriert einen neuen Benutzer.
-	 * Beispiel: curl -X POST localhost:8080/tehame/v1/user -H "email: gude@gude.de" -H "passwort: a" -v
+	 * Beispiel: curl -X POST localhost:8080/tehame/rest/v1/user -H "email: gude@gude.de" -H "passwort: a" -v
 	 * Diese Methode wird nicht als Teil einer Transaktion ausgeführt, 
 	 * die Methoden der UserBean hingegen schon.
 	 * 

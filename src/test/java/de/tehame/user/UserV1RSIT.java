@@ -18,7 +18,7 @@ public class UserV1RSIT {
 	 */
 	@Test
 	public void register() throws Exception {
-		ClientRequest request = new ClientRequest("http://localhost:8080/tehame/v1/user");
+		ClientRequest request = new ClientRequest("http://localhost:8080/tehame/rest/v1/user");
 		request.header("email", System.currentTimeMillis() + "@test.de");
 		request.header("passwort", "%%%%%p4ssW0rt%%%%%");
 		ClientResponse<String> response = request.post(String.class);
