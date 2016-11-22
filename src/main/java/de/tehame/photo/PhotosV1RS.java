@@ -21,7 +21,7 @@ import org.jboss.crypto.CryptoUtil;
 import org.jboss.logging.Logger;
 
 import de.tehame.photo.meta.MetadataBuilder;
-import de.tehame.photo.meta.MetadatenBean;
+import de.tehame.photo.meta.MetadatenMongoDB;
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.User;
 import de.tehame.user.UserBean;
@@ -32,10 +32,13 @@ public class PhotosV1RS {
 	private static final Logger LOGGER = Logger.getLogger(PhotosV1RS.class);
 	
 	@Inject
-	UserBean userBean;
+	private UserBean userBean;
 	
 	@Inject
-	MetadatenBean metaDatenBean;
+	private MetadatenMongoDB metadatenDB;
+	
+	@Inject
+	private PhotosS3 photosS3;
 
 	@GET
 	@Path("status")
@@ -74,9 +77,14 @@ public class PhotosV1RS {
 			
 			final byte[] fileData = this.leseStream(is);
 			
+			String s3key = null;
+			
 			if (fileData != null && fileData.length != 0) {
+				
+				PhotoMetadaten metadaten = null;
+				
 				try {
-					this.metaDatenBean.saveImageToS3andMongo(fileData, email);
+					metadaten = MetadataBuilder.getMetaData(fileData);
 				} catch (ImageReadException e) {
 					LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -84,11 +92,26 @@ public class PhotosV1RS {
 					LOGGER.error(e);
 					throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
 				}
+				
+				try {
+					s3key = this.photosS3.speicherePhoto(fileData);
+				} catch (Exception e) {
+					LOGGER.error("Konnte Object nicht in S3 speichern.", e);
+				}
+				
+				try {
+					this.metadatenDB.savePhotoDetailsToMongo(user, s3key, "tehame", metadaten);
+				} catch (Exception e) {
+					LOGGER.error("Konnte Photo Details nicht in MongoDB speichern.", e);
+				}
+				
+				// TODO wenn ein fehler auftritt schritte davor rückgängig machen
+				
 			} else {
 				throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
 			}
 			
-			return "eine s3 id"; //TODO S3 id/url?
+			return s3key;
 		} else {
 			throw new WebApplicationException( Response.Status.UNAUTHORIZED);
 		}

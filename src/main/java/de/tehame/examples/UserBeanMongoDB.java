@@ -7,12 +7,12 @@ import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
-import de.tehame.Properties;
+import de.tehame.TehameProperties;
 
 public class UserBeanMongoDB {
 
 	public boolean authUser(String email, String passwort) {
-	   	MongoClientURI uri  = new MongoClientURI(Properties.MONGO_URL); 
+	   	MongoClientURI uri  = new MongoClientURI(TehameProperties.MONGO_DB_URL); 
 	    MongoClient client = new MongoClient(uri);
 	    DB db = client.getDB(uri.getDatabase());
 	    DBCollection users = db.getCollection("user");
