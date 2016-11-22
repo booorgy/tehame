@@ -39,4 +39,22 @@ public class UserBean {
 		// Es wurde bereits ein User mit der EMail gefunden.
 		return false;
 	}
+	
+	/**
+	 * Sucht einen User anhand seiner EMail Adresse.
+	 * @param email EMail.
+	 * @return User.
+	 */
+	public User sucheUser(String email) {
+		TypedQuery<User> q = this.em.createQuery(
+				"SELECT u FROM user AS u WHERE u.email = :email", 
+				User.class)
+				.setParameter("email", email);
+		
+		try {
+			return q.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
 }

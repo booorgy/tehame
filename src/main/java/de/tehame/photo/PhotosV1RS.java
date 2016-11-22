@@ -17,11 +17,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.imaging.ImageReadException;
+import org.jboss.crypto.CryptoUtil;
 import org.jboss.logging.Logger;
 
 import de.tehame.photo.meta.MetadataBuilder;
 import de.tehame.photo.meta.MetadatenBean;
 import de.tehame.photo.meta.PhotoMetadaten;
+import de.tehame.user.User;
 import de.tehame.user.UserBean;
 
 @Path("v1/photos")
@@ -47,25 +49,34 @@ public class PhotosV1RS {
 		return id;
 	}
 	
-	// Beispiel: curl localhost:8080/tehame/v1/photos -v -H "Content-Type: image/jpeg" -H "email: gude@gude.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	// Beispiel: curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	// Das @ Zeichen definiert einen Pfad
 	@POST
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes("image/jpeg")
-	public String addPhoto(final InputStream is, @HeaderParam("email") String email, @HeaderParam("passwort") String passwort) {
+	public String addPhoto(
+			final InputStream is, 
+			@HeaderParam("email") String email, 
+			@HeaderParam("passwort") String passwort) {
 		
-		// TODO auth
-		LOGGER.trace("email: " + email);
-		LOGGER.trace("passwort: " + passwort);
-		if (true /*userBean.authUser(email, passwort)*/) {		
-			// TODO prüfen, dass upload ein bild ist und nicht ausführbar
+		LOGGER.trace("Versuche Photo hochzuladen. HeaderParams: email: " 
+				+ email + ", passwort: " + passwort);
+		
+		final User user = this.userBean.sucheUser(email);
+		
+		// TODO später passwort bereits gehasht übermitteln
+		final String passwortHash = CryptoUtil.createPasswordHash(
+				"SHA-256", "base64", null, null, passwort);
+		
+		if (user != null && user.getPasswort().equals(passwortHash)) {		
+			// TODO prüfen, dass upload ein bild ist und nicht ausführbar etc. (MetaDaten Angriffe)
 			
 			final byte[] fileData = this.leseStream(is);
 			
 			if (fileData != null && fileData.length != 0) {
 				try {
-					metaDatenBean.saveImageToS3andMongo(fileData, email);
+					this.metaDatenBean.saveImageToS3andMongo(fileData, email);
 				} catch (ImageReadException e) {
 					LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -101,10 +112,10 @@ public class PhotosV1RS {
 			while ((anzBytes = is.read(buffer)) != -1) {
 				anzBytesTotal += anzBytes;
 				// TODO Maximale Größe limitieren
-				LOGGER.trace(anzBytes + " Bytes aus InputStream gelesen (" 
-						+ anzBytesTotal + " Bytes total)");
 				os.write(buffer, 0, anzBytes);
 			}
+
+			LOGGER.trace(anzBytesTotal + " Bytes aus InputStream gelesen");
 			
 			os.flush();
 			filedata = os.toByteArray();

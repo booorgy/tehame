@@ -38,7 +38,7 @@ public class MetadatenBean {
         String key = "MyObjectKey-" + UUID.randomUUID();	            
         
         // ERST einmal erstellen lassen !!! ka warum es von hand net geht!
-        // s3.createBucket(bucketName); 
+//        s3.createBucket(bucketName); 
        
         File file = new File(key);
         FileUtils.writeByteArrayToFile(file, fileData);
