@@ -1,6 +1,8 @@
 package de.tehame.user;
 
+import javax.annotation.Resource;
 import javax.ejb.LocalBean;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -15,6 +17,9 @@ public class UserBean {
 
 	@PersistenceContext(unitName = "tehamePU")
 	private EntityManager em;
+	
+	@Resource 
+	private SessionContext context;
 	
 	/**
 	 * @param user Ein neuer User.
@@ -56,5 +61,16 @@ public class UserBean {
 		} catch (NoResultException e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Liefert das UserObject des angemeldeten Users.
+	 * @return
+	 */
+	public User getLoggedInUser() {
+		String login = context.getCallerPrincipal().getName();
+        TypedQuery<User> createQuery = em.createQuery("from user where email = '" + login + "'", User.class);
+        User user = createQuery.getSingleResult();                       
+        return user;
 	}
 }
