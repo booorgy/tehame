@@ -16,12 +16,12 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 
 /**
- * Diese Klasse ermöglicht Zugriffe auf S3. 
+ * Diese Klasse ermöglicht Zugriffe auf S3.
  */
 public class PhotosS3 {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(PhotosS3.class);
-	
+
 	public static final String REGION = "eu-central-1";
 	public static final String BUCKET_PHOTOS = "tehame";
 	public static final String BUCKET_THUMBNAILS = "tehame-thumbnails";
@@ -35,16 +35,16 @@ public class PhotosS3 {
 	public String speicherePhoto(final byte[] fileData) {
 		AmazonS3Client s3 = new AmazonS3Client();
 		s3.setRegion(RegionUtils.getRegion(REGION));
-        String bucketName = BUCKET_PHOTOS;
-        String key = UUID.randomUUID().toString();         
-        ObjectMetadata metadata = new ObjectMetadata(); // TODO ?
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
-        PutObjectRequest putRequest = new PutObjectRequest(bucketName, key, inputStream, metadata);
-        s3.putObject(putRequest);
-        LOGGER.trace("S3 Object mit Key '" + key + "' ins Bucket '" + bucketName + "' geschrieben.");
-        return key;
+		String bucketName = BUCKET_PHOTOS;
+		String key = UUID.randomUUID().toString();
+		ObjectMetadata metadata = new ObjectMetadata(); // TODO ?
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
+		PutObjectRequest putRequest = new PutObjectRequest(bucketName, key, inputStream, metadata);
+		s3.putObject(putRequest);
+		LOGGER.trace("S3 Object mit Key '" + key + "' ins Bucket '" + bucketName + "' geschrieben.");
+		return key;
 	}
-	
+
 	/**
 	 * Lade ein Photo aus S3.
 	 * 
@@ -60,6 +60,7 @@ public class PhotosS3 {
 		S3Object s3object = s3.getObject(getRequest);
 		InputStream is = s3object.getObjectContent();
 		byte[] photoData = IOUtils.toByteArray(is);
+		LOGGER.trace("S3 Object mit Key '" + key + "' aus Bucket '" + bucket + "' geladen.");
 		return photoData;
 	}
 }

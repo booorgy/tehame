@@ -18,13 +18,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.imaging.ImageReadException;
-import org.jboss.crypto.CryptoUtil;
 import org.jboss.logging.Logger;
 
 import de.tehame.photo.meta.MetadataBuilder;
@@ -51,19 +49,49 @@ public class PhotosV1RS {
 	private PhotosS3 photosS3;
 
 	@GET
-	@Path("status")
-	public String status() {
-		return "OK";
+	@Path("ping")
+	public String ping() {
+		return "PONG";
 	}
 	
 	/**
-	 * Liefert ein Photo aus. 
-	 * In diesem Fall muss über die Header authentifiziert werden.
+	 * Liefert ein Photo aus für Clients, die sich über JAAS authentifizieren (siehe Cookie im Beispiel-Curl). 
 	 * 
+	 * Die URI hat ein zusätzliches /www/ im Pfad.
+	 * 
+	 * Beispiel Curl:
+	 * curl http://localhost:8080/tehame/rest/v1/photos/www/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd -v 
+	 * -H "Cookie: JSESSIONID=t0rgALa1uSTF0CE2AiazMQc_acRgQDwsRN5o1DD8.desktop-q5rtqjv"
+	 * 
+	 * @param bucketName S3 Bucket Name aus URI.
+	 * @param objectKey S3 Object Key aus URI.
+	 * @param email User EMail Header.
+	 * @param passwort User Passwort Header.
+	 * @return Photo.
+	 */
+	@GET
+	@Path("www/{bucket}/{objectkey}")
+	@Produces("image/jpg")
+	public Response photoWeb(
+			@PathParam("bucket") 	 final String bucketName, 
+			@PathParam("objectkey")  final String objectKey) {
+		
+		LOGGER.trace("Request von User '" + this.getUserName() + "' zu Photo '" 
+				+ bucketName + "/" + objectKey + "'");
+		
+		return this.erstellePhotoResponse(PhotosS3.BUCKET_PHOTOS, objectKey);
+	}
+	
+	/**
+	 * Liefert ein Photo aus für Clients, die sich über Header authentifizieren. 
+	 * 
+	 * Beispiel Curl:
 	 * curl http://localhost:8080/tehame/rest/v1/photos/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd -v -H "email: admin@tehame.de" -H "passwort: a"
 	 * 
-	 * @param bucketName S3 Bucket Name.
-	 * @param objectKey S3 Object Key.
+	 * @param bucketName S3 Bucket Name aus URI.
+	 * @param objectKey S3 Object Key aus URI.
+	 * @param email User EMail Header.
+	 * @param passwort User Passwort Header.
 	 * @return Photo.
 	 */
 	@GET
@@ -78,10 +106,20 @@ public class PhotosV1RS {
 		User user = this.userBean.sucheUser(email);
 		this.auth(user, passwort);
 		
-		// TODO auth
-//		LOGGER.trace("Request von User '" + this.getUserName() + "' zu Photo '" 
-//				+ bucketName + "/" + objectKey + "'");
+		LOGGER.trace("Request von User '" + email + "' zu Photo '" 
+				+ bucketName + "/" + objectKey + "'");
 		
+		return this.erstellePhotoResponse(PhotosS3.BUCKET_PHOTOS, objectKey);
+	}
+
+	/**
+	 * Stellt einen Response Stream bereit.
+	 * 
+	 * @param bucket S3 Bucket.
+	 * @param objectKey S3 Object Key.
+	 * @return JAX-RS Response.
+	 */
+	private Response erstellePhotoResponse(final String bucket, final String objectKey) {
 		return Response.ok(new StreamingOutput() {
 			@Override
 			public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -89,7 +127,7 @@ public class PhotosV1RS {
 				byte[] photo = null;
 				try {
 					photo = PhotosV1RS.this.photosS3.ladePhoto(
-							PhotosS3.BUCKET_THUMBNAILS, objectKey);
+							bucket, objectKey);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -122,8 +160,17 @@ public class PhotosV1RS {
 		return userName;
 	}
 	
-	// Beispiel: curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
-	// Das @ Zeichen definiert einen Pfad
+	/**
+	 * Speichert ein neues Photo.
+	 * 
+	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * 
+	 * @param is Der Input Stream wird durch JAX-RS injected.
+	 * @param email EMail Header.
+	 * @param passwort Passwort Header.
+	 * @return Object Key aus S3.
+	 */
 	@POST
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
