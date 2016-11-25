@@ -69,7 +69,6 @@ public class MetadatenMongoDB implements Serializable {
 	    photo.put("s3bucket", s3bucket);
 	    photo.put("longitude", metadaten.getLongitude());
 	    photo.put("latitude", metadaten.getLatitude());
-	    // TODO alle metadaten speichern
 	    photo.put("aufnahmeZeitpunkt", new Timestamp(new Date().getTime()));	
 	    photo.put("useruuid", user.getUuid());	
 	    photos.insert(photo);	    
@@ -93,7 +92,9 @@ public class MetadatenMongoDB implements Serializable {
 					(double) tobj.get("longitude"), 
 					(double) tobj.get("latitude"), 
 					(int) tobj.get("breite"), 
-					(int) tobj.get("hoehe"));	
+					(int) tobj.get("hoehe"),
+					(String) tobj.get("s3bucket"),
+					(String) tobj.get("s3key"));	
 			result.add(photoMetadaten);
 		}
 		
