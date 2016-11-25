@@ -28,18 +28,30 @@ public class PhotoMetadaten {
 	private final int hoehe;
 	
 	/**
+	 * ID des Bucket im S3.
+	 */
+	private final String s3bucket;
+	
+	/**
+	 * Id des Objectes im Bucket im S3.
+	 */
+	private final String s3key;
+	
+	/**
 	 * @param dateTimeOriginal Datum und Uhrzeit der Aufnahme.
 	 * @param longitude Längengrad.
 	 * @param latitude Breitengrad.
 	 * @param breite Breite in Pixel.
 	 * @param hoehe Höhe in Pixel.
 	 */
-	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe) {
+	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key) {
 		this.aufnahmeZeitpunkt = dateTimeOriginal;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.breite = breite;
 		this.hoehe = hoehe;
+		this.s3bucket = s3bucket;
+		this.s3key = s3key;
 	}
 
 
@@ -62,8 +74,24 @@ public class PhotoMetadaten {
 
 	public int getBreite() {
 		return breite;
-	}
+	}	
 	
+	public String getAufnahmeZeitpunkt() {
+		return aufnahmeZeitpunkt;
+	}
+
+
+
+	public String getS3bucket() {
+		return s3bucket;
+	}
+
+
+	public String getS3key() {
+		return s3key;
+	}
+
+
 	@Override
 	public String toString() {
 		return super.toString() 
@@ -72,6 +100,8 @@ public class PhotoMetadaten {
 				+ ", hoehe=" + hoehe
 				+ ", longitude=" + longitude 
 				+ ", latitude=" + latitude 
+				+ ", s3bucket=" + s3bucket 
+				+ ", s3key=" + s3key 
 				+ "]";
 	}
 }
