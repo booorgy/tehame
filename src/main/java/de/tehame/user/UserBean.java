@@ -11,6 +11,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import org.jboss.crypto.CryptoUtil;
+
 @Stateless
 @LocalBean
 public class UserBean {
@@ -64,13 +66,36 @@ public class UserBean {
 	}
 	
 	/**
-	 * Liefert das UserObject des angemeldeten Users.
-	 * @return
+	 * @return Die User Entity des angemeldeten Users.
 	 */
 	public User getLoggedInUser() {
-		String login = context.getCallerPrincipal().getName();
-        TypedQuery<User> createQuery = em.createQuery("from user where email = '" + login + "'", User.class);
+		String login = this.context.getCallerPrincipal().getName();
+        TypedQuery<User> createQuery = this.em.createQuery(
+        		"from user where email = '" + login + "'", 
+        		User.class);
         User user = createQuery.getSingleResult();                       
         return user;
+	}
+	
+	/**
+	 * @param user User Entity.
+	 * @param passwort Passwort.
+	 * @return Ob die Credentials gültig sind.
+	 */
+	public boolean authenticated(User user, String passwort) {
+		
+		if (user == null) {
+			return false;
+		}
+		
+		boolean authenticated;
+		
+		// TODO später passwort bereits gehasht übermitteln
+		final String passwortHash = CryptoUtil.createPasswordHash(
+				"SHA-256", "base64", null, null, passwort);
+		
+		authenticated = user.getPasswort().equals(passwortHash);
+		
+		return authenticated;
 	}
 }

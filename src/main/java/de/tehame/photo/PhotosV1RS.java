@@ -3,6 +3,8 @@ package de.tehame.photo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.Principal;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -13,8 +15,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.crypto.CryptoUtil;
@@ -31,6 +38,9 @@ public class PhotosV1RS {
 	
 	private static final Logger LOGGER = Logger.getLogger(PhotosV1RS.class);
 	
+	@Context 
+	private SecurityContext securityContext;
+	
 	@Inject
 	private UserBean userBean;
 	
@@ -46,10 +56,70 @@ public class PhotosV1RS {
 		return "OK";
 	}
 	
+	/**
+	 * Liefert ein Photo aus. 
+	 * In diesem Fall muss über die Header authentifiziert werden.
+	 * 
+	 * curl http://localhost:8080/tehame/rest/v1/photos/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd -v -H "email: admin@tehame.de" -H "passwort: a"
+	 * 
+	 * @param bucketName S3 Bucket Name.
+	 * @param objectKey S3 Object Key.
+	 * @return Photo.
+	 */
 	@GET
-	@Path("{id}")
-	public String photo(@PathParam("id") String id) {
-		return id;
+	@Path("{bucket}/{objectkey}")
+	@Produces("image/jpg")
+	public Response photo(
+			@PathParam("bucket") 	 final String bucketName, 
+			@PathParam("objectkey")  final String objectKey,
+			@HeaderParam("email") 	 final String email, 
+			@HeaderParam("passwort") final String passwort) {
+		
+		User user = this.userBean.sucheUser(email);
+		this.auth(user, passwort);
+		
+		// TODO auth
+//		LOGGER.trace("Request von User '" + this.getUserName() + "' zu Photo '" 
+//				+ bucketName + "/" + objectKey + "'");
+		
+		return Response.ok(new StreamingOutput() {
+			@Override
+			public void write(OutputStream os) throws IOException, WebApplicationException {
+				
+				byte[] photo = null;
+				try {
+					photo = PhotosV1RS.this.photosS3.ladePhoto(
+							PhotosS3.BUCKET_THUMBNAILS, objectKey);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				os.write(photo);
+				os.flush();
+			}
+		}).build();
+	}
+
+	private void auth(User user, String passwort) {
+		if (!this.userBean.authenticated(user, passwort)) {
+			throw new WebApplicationException(Status.UNAUTHORIZED);
+		}
+	}
+
+	/**
+	 * @return Der Name des angemeldeten Benutzers.
+	 */
+	private String getUserName() {
+		String userName = null;
+		Principal principal = this.securityContext.getUserPrincipal();
+		
+		if (principal != null) {
+			userName = principal.getName();
+		} else {
+			throw new WebApplicationException(Status.UNAUTHORIZED);
+		}
+		
+		return userName;
 	}
 	
 	// Beispiel: curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
@@ -66,55 +136,48 @@ public class PhotosV1RS {
 		LOGGER.trace("Versuche Photo hochzuladen. HeaderParams: email: " 
 				+ email + ", passwort: " + passwort);
 		
-		final User user = this.userBean.sucheUser(email);
+		User user = this.userBean.sucheUser(email);
+		this.auth(user, passwort);
 		
-		// TODO später passwort bereits gehasht übermitteln
-		final String passwortHash = CryptoUtil.createPasswordHash(
-				"SHA-256", "base64", null, null, passwort);
+		// TODO prüfen, dass upload ein bild ist und nicht ausführbar etc. (MetaDaten Angriffe)
 		
-		if (user != null && user.getPasswort().equals(passwortHash)) {		
-			// TODO prüfen, dass upload ein bild ist und nicht ausführbar etc. (MetaDaten Angriffe)
+		final byte[] fileData = this.leseStream(is);
+		
+		String s3key = null;
+		
+		if (fileData != null && fileData.length != 0) {
 			
-			final byte[] fileData = this.leseStream(is);
+			PhotoMetadaten metadaten = null;
 			
-			String s3key = null;
-			
-			if (fileData != null && fileData.length != 0) {
-				
-				PhotoMetadaten metadaten = null;
-				
-				try {
-					metadaten = MetadataBuilder.getMetaData(fileData);
-				} catch (ImageReadException e) {
-					LOGGER.error("Das Bild konnte nicht geparsed werden."); 
-					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-				} catch (IOException e) {
-					LOGGER.error(e);
-					throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-				}
-				
-				try {
-					s3key = this.photosS3.speicherePhoto(fileData);
-				} catch (Exception e) {
-					LOGGER.error("Konnte Object nicht in S3 speichern.", e);
-				}
-				
-				try {
-					this.metadatenDB.savePhotoDetailsToMongo(user, s3key, "tehame", metadaten);
-				} catch (Exception e) {
-					LOGGER.error("Konnte Photo Details nicht in MongoDB speichern.", e);
-				}
-				
-				// TODO wenn ein fehler auftritt schritte davor rückgängig machen
-				
-			} else {
-				throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
+			try {
+				metadaten = MetadataBuilder.getMetaData(fileData);
+			} catch (ImageReadException e) {
+				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
+				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+			} catch (IOException e) {
+				LOGGER.error(e);
+				throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
 			}
 			
-			return s3key;
+			try {
+				s3key = this.photosS3.speicherePhoto(fileData);
+			} catch (Exception e) {
+				LOGGER.error("Konnte Object nicht in S3 speichern.", e);
+			}
+			
+			try {
+				this.metadatenDB.savePhotoDetailsToMongo(user, s3key, "tehame", metadaten);
+			} catch (Exception e) {
+				LOGGER.error("Konnte Photo Details nicht in MongoDB speichern.", e);
+			}
+			
+			// TODO wenn ein fehler auftritt schritte davor rückgängig machen
+			
 		} else {
-			throw new WebApplicationException( Response.Status.UNAUTHORIZED);
+			throw new WebApplicationException("File size is zero", Response.Status.BAD_REQUEST);
 		}
+		
+		return s3key;
 	}
 
 	/**
