@@ -93,7 +93,7 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="CONSOLE">
-                <level name="INFO"/>
+                <level name="TRACE"/>
                 <formatter>
                     <named-formatter name="COLOR-PATTERN"/>
                 </formatter>
@@ -108,6 +108,9 @@
             </periodic-rotating-file-handler>
             <logger category="com.arjuna">
                 <level name="WARN"/>
+            </logger>
+            <logger category="de.tehame">
+                <level name="TRACE"/>
             </logger>
             <logger category="org.jboss.as.config">
                 <level name="DEBUG"/>
