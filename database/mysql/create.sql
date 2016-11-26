@@ -28,7 +28,7 @@ CREATE TABLE `userrole` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Passwort: a
-INSERT INTO `tehame`.`user` (`uuid`, `email`, `passwort`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ed', 'admin@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=');
-INSERT INTO `tehame`.`role` (`id`, `name`) VALUES ('1', 'admin');
-INSERT INTO `tehame`.`role` (`id`, `name`) VALUES ('2', 'user');
-INSERT INTO `tehame`.`userrole` (`uuiduser`, `idrole`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ed', '1');
+INSERT INTO `user` (`uuid`, `email`, `passwort`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ed', 'admin@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=');
+INSERT INTO `role` (`id`, `name`) VALUES ('1', 'admin');
+INSERT INTO `role` (`id`, `name`) VALUES ('2', 'user');
+INSERT INTO `userrole` (`uuiduser`, `idrole`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ed', '1');
