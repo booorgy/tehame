@@ -332,6 +332,21 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>
+            <security-domain name="tehameSD" cache-type="default">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.DatabaseServerLoginModule" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/${env.RDS_DB_NAME}DS"/>
+                            <module-option name="principalsQuery" value="SELECT u.passwort FROM user AS u WHERE u.email = ?"/>
+                            <module-option name="rolesQuery" value="SELECT r.name, 'Roles' FROM user AS u, role AS r, userrole AS ur WHERE u.email = ? AND u.uuid = ur.uuiduser AND r.id = ur.idrole"/>
+                            <module-option name="hashCharset" value="UTF-8"/>
+                            <module-option name="hashAlgorithm" value="SHA-256"/>
+                            <module-option name="hashEncoding" value="base64"/>
+                            <module-option name="ignorePasswordCase" value="false"/>
+                            <module-option name="unauthenticatedIdentity" value="gast"/>
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
                 <security-domain name="other" cache-type="default">
                     <authentication>
                         <login-module code="Remoting" flag="optional">
