@@ -4,10 +4,52 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html">
+	
+<h:outputScript library="js" name="jquery.js" />
+<h:outputScript library="js" name="jquery.lazy.min.js" />
+<h:outputScript library="js" name="jquery.lazy.plugins.min.js" />
+<h:outputStylesheet library="css" name="lazy.css"  />
+
+<script type="text/javascript">
+$(function() {
+	$('.lazy').lazy({
+		// your configuration goes here
+		scrollDirection: 'vertical',
+		effect: 'fadeIn',
+		visibleOnly: true,
+		onError: function(element) {
+			console.log('error loading ' + element.data('src'));
+		}
+	});
+});
+</script>
+
 
 <h:body>
 	<h3>ZEIGE ALLES123</h3>
-	<img src="http://localhost:8080/tehame/rest/v1/photos/www/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd"></img>
-	<!-- <h:outputLabel value="XXphotoMB.test()XX" /> -->
+	<img src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" width="700"/>
+	<p>1</p>
+	<p>2</p>
+	<p>3</p>
+	<p>4</p>
+	<p>5</p>
+	<p>6</p>
+	<p>7</p>
+	<p>8</p>
+	<p>9</p>
+	<p>LAZY GO</p>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-12f4ab69-c513-4dc1-b552-95d038dda7b2"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
+
+	<!--  <img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
+	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
+	--><!-- <h:outputLabel value="XXphotoMB.test()XX" /> -->
 </h:body>
 </html>
