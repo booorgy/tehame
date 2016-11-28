@@ -53,6 +53,7 @@ public class PhotoMetadaten {
 	 * @param latitude Breitengrad.
 	 * @param breite Breite in Pixel.
 	 * @param hoehe Höhe in Pixel.
+	 * @param zugehoerigkeit 0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich
 	 */
 	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
 		this.aufnahmeZeitpunkt = dateTimeOriginal;
