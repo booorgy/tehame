@@ -24,7 +24,7 @@ public class MetadataBuilder {
 
 	private static final Logger LOGGER = Logger.getLogger(MetadataBuilder.class);
 
-	public static PhotoMetadaten getMetaData(final byte[] fileData) 
+	public static PhotoMetadaten getMetaData(final byte[] fileData, int zugehoerigkeit) 
 			throws ImageReadException, IOException {
 		
 		String dateTimeOriginal = null; 
@@ -118,7 +118,7 @@ public class MetadataBuilder {
 			}
 		}
 		
-		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe, null, null);
+		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, 0);
 		LOGGER.trace(metaDaten);
 		return metaDaten;
 	}

@@ -38,13 +38,18 @@ public class PhotoMetadaten {
 	private final String s3key;
 	
 	/**
+	 * Ist es ein Privat, Familien, Freunde oder Public Bild?
+	 */
+	private final int zugehoerigkeit;
+	
+	/**
 	 * @param dateTimeOriginal Datum und Uhrzeit der Aufnahme.
 	 * @param longitude Längengrad.
 	 * @param latitude Breitengrad.
 	 * @param breite Breite in Pixel.
 	 * @param hoehe Höhe in Pixel.
 	 */
-	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key) {
+	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
 		this.aufnahmeZeitpunkt = dateTimeOriginal;
 		this.longitude = longitude;
 		this.latitude = latitude;
@@ -52,6 +57,7 @@ public class PhotoMetadaten {
 		this.hoehe = hoehe;
 		this.s3bucket = s3bucket;
 		this.s3key = s3key;
+		this.zugehoerigkeit = zugehoerigkeit;
 	}
 
 
@@ -102,6 +108,12 @@ public class PhotoMetadaten {
 				+ ", latitude=" + latitude 
 				+ ", s3bucket=" + s3bucket 
 				+ ", s3key=" + s3key 
+				+ ", zugehoerigkeit=" + zugehoerigkeit 
 				+ "]";
+	}
+
+
+	public int getZugehoerigkeit() {
+		return zugehoerigkeit;
 	}
 }

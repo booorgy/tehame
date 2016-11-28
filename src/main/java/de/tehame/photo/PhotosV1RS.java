@@ -164,7 +164,7 @@ public class PhotosV1RS {
 	 * Speichert ein neues Photo.
 	 * 
 	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 0" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.
@@ -177,6 +177,7 @@ public class PhotosV1RS {
 	@Consumes("image/jpeg")
 	public String addPhoto(
 			final InputStream is, 
+			@HeaderParam("zugehoerigkeit") int zugehoerigkeit, 
 			@HeaderParam("email") String email, 
 			@HeaderParam("passwort") String passwort) {
 		
@@ -197,7 +198,7 @@ public class PhotosV1RS {
 			PhotoMetadaten metadaten = null;
 			
 			try {
-				metadaten = MetadataBuilder.getMetaData(fileData);
+				metadaten = MetadataBuilder.getMetaData(fileData, zugehoerigkeit);
 			} catch (ImageReadException e) {
 				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);

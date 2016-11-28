@@ -79,8 +79,8 @@
 								<properties>
 									<!-- https://codehaus-cargo.github.io/cargo/WildFly+10.x.html -->
 									<cargo.hostname>localhost</cargo.hostname>
-									<cargo.remote.username>admin</cargo.remote.username>
-									<cargo.remote.password>gude</cargo.remote.password>
+									<cargo.remote.username>gude</cargo.remote.username>
+									<cargo.remote.password>moin</cargo.remote.password>
 									<cargo.jboss.management-http.port>${wfly.management.http.port}</cargo.jboss.management-http.port>
 									<cargo.logging>high</cargo.logging>
 								</properties>
@@ -202,7 +202,7 @@
 		<dependency>
 		    <groupId>com.amazonaws</groupId>
 		    <artifactId>aws-java-sdk-s3</artifactId>
-		    <version>1.11.60</version>
+		    <version>1.11.59</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>

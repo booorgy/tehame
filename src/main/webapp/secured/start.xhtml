@@ -35,13 +35,15 @@ $(function() {
     <p:menuitem value="Freunde" outcome="start" icon="ui-icon-document" iconPos="top">
         <f:param name="tabIndex" value="2" />
     </p:menuitem>
-    <p:menuitem value="Öffendlich" outcome="start" icon="ui-icon-wrench" iconPos="top">
+    <p:menuitem value="Öffentlich" outcome="start" icon="ui-icon-wrench" iconPos="top">
         <f:param name="tabIndex" value="3" />
     </p:menuitem>
 </p:tabMenu>
 
 	<h3>ZEIGE ALLES123</h3>
-	<img src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" width="700"/>
+	<h:outputText value="#{photoMB.zeigeBilderFuerKategorie()}" escape="false"/>
+	
+	
 	<p>1</p>
 	<p>2</p>
 	<p>3</p>
