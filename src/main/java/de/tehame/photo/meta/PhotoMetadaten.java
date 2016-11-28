@@ -36,6 +36,11 @@ public class PhotoMetadaten {
 	 * Id des Objectes im Bucket im S3.
 	 */
 	private final String s3key;
+
+	/**
+	 * Die UUID des Events, zu dem dieses Bild gehört.
+	 */
+	private String eventUuid;
 	
 	/**
 	 * @param dateTimeOriginal Datum und Uhrzeit der Aufnahme.
@@ -91,6 +96,13 @@ public class PhotoMetadaten {
 		return s3key;
 	}
 
+	public String getEventUuid() {
+		return eventUuid;
+	}
+
+	public void setEventUuid(String eventUuid) {
+		this.eventUuid = eventUuid;
+	}
 
 	@Override
 	public String toString() {
@@ -102,6 +114,7 @@ public class PhotoMetadaten {
 				+ ", latitude=" + latitude 
 				+ ", s3bucket=" + s3bucket 
 				+ ", s3key=" + s3key 
+				+ ", eventUuid=" + eventUuid
 				+ "]";
 	}
 }
