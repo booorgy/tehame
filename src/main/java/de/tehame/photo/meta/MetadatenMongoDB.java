@@ -94,7 +94,8 @@ public class MetadatenMongoDB implements Serializable {
 					(int) tobj.get("breite"), 
 					(int) tobj.get("hoehe"),
 					(String) tobj.get("s3bucket"),
-					(String) tobj.get("s3key"));	
+					(String) tobj.get("s3key"),
+					(int) tobj.get("zugehoerigkeit"));	
 			result.add(photoMetadaten);
 		}
 		

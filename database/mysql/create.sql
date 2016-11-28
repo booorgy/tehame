@@ -38,7 +38,7 @@ INSERT INTO `userrole` (`uuiduser`, `idrole`) VALUES ('e26fc393-9219-44b5-b681-f
 CREATE TABLE `relation` (
   `uuidusera` varchar(255) NOT NULL,
   `uuiduserb` varchar(255) NOT NULL,
-  `type` int(11) NOT NULL COMMENT '0 = ACQUAINTANCE, 1 = FRIEND, 2 = FAMILY, 3 = PARTNER',
+  `type` int(11) NOT NULL COMMENT '0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich',
   PRIMARY KEY (`uuidusera`,`uuiduserb`,`type`),
   KEY `userb_idx` (`uuiduserb`),
   CONSTRAINT `usera` FOREIGN KEY (`uuidusera`) REFERENCES `user` (`uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
