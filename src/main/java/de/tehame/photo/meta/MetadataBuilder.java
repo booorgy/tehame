@@ -118,7 +118,7 @@ public class MetadataBuilder {
 			}
 		}
 		
-		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, 0);
+		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, zugehoerigkeit);
 		LOGGER.trace(metaDaten);
 		return metaDaten;
 	}

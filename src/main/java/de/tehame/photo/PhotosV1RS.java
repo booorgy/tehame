@@ -214,7 +214,7 @@ public class PhotosV1RS {
 			}
 			
 			try {
-				this.metadatenDB.savePhotoDetailsToMongo(user, s3key, "tehame", metadaten);
+				this.metadatenDB.savePhotoDetailsToMongo(user, s3key, PhotosS3.BUCKET_PHOTOS, metadaten);
 			} catch (Exception e) {
 				LOGGER.error("Konnte Photo Details nicht in MongoDB speichern.", e);
 			}

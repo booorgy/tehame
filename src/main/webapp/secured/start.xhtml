@@ -3,69 +3,12 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets" 
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
-<h:head>	
-<h:outputScript library="js" name="jquery.js" />
-<h:outputScript library="js" name="jquery.lazy.min.js" />
-<h:outputScript library="js" name="jquery.lazy.plugins.min.js" />
-<h:outputStylesheet library="css" name="lazy.css"  />
-
-<script type="text/javascript">
-$(function() {
-	$('.lazy').lazy({
-		// your configuration goes here
-		scrollDirection: 'vertical',
-		effect: 'fadeIn',
-		visibleOnly: true,
-		onError: function(element) {
-			
-		}
-	});
-});
-</script>
-</h:head>
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">	
 <h:body>
-<p:tabMenu activeIndex="#{photoMB.tabIndex}">
-    <p:menuitem value="Privat" outcome="start" icon="ui-icon-star" iconPos="top">
-        <f:param name="tabIndex" value="0" />
-    </p:menuitem>
-    <p:menuitem value="Familie" outcome="start" icon="ui-icon-search" iconPos="top">
-        <f:param name="tabIndex" value="1" />
-    </p:menuitem>
-    <p:menuitem value="Freunde" outcome="start" icon="ui-icon-document" iconPos="top">
-        <f:param name="tabIndex" value="2" />
-    </p:menuitem>
-    <p:menuitem value="Öffentlich" outcome="start" icon="ui-icon-wrench" iconPos="top">
-        <f:param name="tabIndex" value="3" />
-    </p:menuitem>
-</p:tabMenu>
-
-	<h3>ZEIGE ALLES123</h3>
-	<h:outputText value="#{photoMB.zeigeBilderFuerKategorie()}" escape="false"/>
-	
-	
-	<p>1</p>
-	<p>2</p>
-	<p>3</p>
-	<p>4</p>
-	<p>5</p>
-	<p>6</p>
-	<p>7</p>
-	<p>8</p>
-	<p>9</p>
-	<p>LAZY GO</p>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-12f4ab69-c513-4dc1-b552-95d038dda7b2"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/www/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a"/>
-
-	<!--  <img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
-	<img class="lazy" data-src="http://localhost:8080/tehame/rest/v1/photos/tehame20161/MyObjectKey-03bad40f-c5ab-4b6b-9783-7b3bf040406a" src=""/>
-	--><!-- <h:outputLabel value="XXphotoMB.test()XX" /> -->
+	<h:form>
+		<h:commandLink action="privat.xhtml" value="Privat" />
+		<h:commandLink action="familie.xhtml" value="Familie" />
+	</h:form>
 </h:body>
 </html>

@@ -17,6 +17,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import de.tehame.TehameProperties;
+import de.tehame.photo.Zugehoerigkeit;
 import de.tehame.user.User;
 
 /**
@@ -69,21 +70,29 @@ public class MetadatenMongoDB implements Serializable {
 	    photo.put("s3bucket", s3bucket);
 	    photo.put("longitude", metadaten.getLongitude());
 	    photo.put("latitude", metadaten.getLatitude());
-	    photo.put("aufnahmeZeitpunkt", new Timestamp(new Date().getTime()));	
+	    photo.put("aufnahmeZeitpunkt", String.valueOf(new Timestamp(new Date().getTime())));	
 	    photo.put("useruuid", user.getUuid());	
+	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
+	    photo.put("breite", metadaten.getBreite());	
+	    photo.put("hoehe", metadaten.getHoehe());	
 	    photos.insert(photo);	    
 	    
-	    closeMongoConnection();
+	    //closeMongoConnection();
 	    LOGGER.trace("Details zu Photo mit S3 Key '" + s3key + "' in MondoDB gespeichert.");
 	}
 	
+	/**
+	 * Liefert alle eigenen Bilder des Users.
+	 * @param user
+	 * @return
+	 */
 	public ArrayList<PhotoMetadaten> getPhotosByUser(User user) {
 		ArrayList<PhotoMetadaten> result = new ArrayList<PhotoMetadaten>();
 		
 		DBCollection photos = loadConnectMongoCollection("picture");
 		
 		BasicDBObject whereQuery = new BasicDBObject();
-		whereQuery.put("userid", user.getUuid());
+		whereQuery.put("useruuid", user.getUuid());
 		DBCursor cursor = photos.find(whereQuery);
 		while(cursor.hasNext()) {
 			DBObject tobj = cursor.next();
@@ -98,9 +107,43 @@ public class MetadatenMongoDB implements Serializable {
 					(int) tobj.get("zugehoerigkeit"));	
 			result.add(photoMetadaten);
 		}
-		
-		closeMongoConnection();	  
+		//closeMongoConnection();	  
 		
 		return result;
 	}
+	
+	/**
+	 * Liefert alle Bilder des Users mit der entsprechenden Zugehörigkeit.
+	 * @param user
+	 * @param zugehoerigkeit
+	 * @return
+	 */
+	public ArrayList<PhotoMetadaten> getPhotosByUserAndZugehoerigkeit(User user, int zugehoerigkeit) {
+		ArrayList<PhotoMetadaten> result = new ArrayList<PhotoMetadaten>();
+		
+		DBCollection photos = loadConnectMongoCollection("picture");
+		
+		BasicDBObject whereQuery = new BasicDBObject();
+		whereQuery.put("useruuid", user.getUuid());
+		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
+		DBCursor cursor = photos.find(whereQuery);
+		while(cursor.hasNext()) {
+			DBObject tobj = cursor.next();
+			PhotoMetadaten photoMetadaten = new PhotoMetadaten(
+					(String) tobj.get("aufnahmeZeitpunkt"), 
+					(double) tobj.get("longitude"), 
+					(double) tobj.get("latitude"), 
+					(int) tobj.get("breite"), 
+					(int) tobj.get("hoehe"),
+					(String) tobj.get("s3bucket"),
+					(String) tobj.get("s3key"),
+					(int) tobj.get("zugehoerigkeit"));	
+			result.add(photoMetadaten);
+		}
+
+		//closeMongoConnection();	  
+		
+		return result;
+	}
+	
 }
