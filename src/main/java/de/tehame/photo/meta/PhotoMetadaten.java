@@ -5,7 +5,7 @@ public class PhotoMetadaten {
 	/**
 	 * Das Aufnahmedatum und Uhrzeit.
 	 */
-	private final String aufnahmeZeitpunkt;
+	private final long aufnahmeZeitpunkt;
 	
 	/**
 	 * GPS Längengrad (Grad Ost). -1, wenn unbekannt.
@@ -48,15 +48,15 @@ public class PhotoMetadaten {
 	private final int zugehoerigkeit;
 	
 	/**
-	 * @param dateTimeOriginal Datum und Uhrzeit der Aufnahme.
+	 * @param aufnahmeZeitpunkt UNIX Timestamp der Aufnahme.
 	 * @param longitude Längengrad.
 	 * @param latitude Breitengrad.
 	 * @param breite Breite in Pixel.
 	 * @param hoehe Höhe in Pixel.
 	 * @param zugehoerigkeit 0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich
 	 */
-	public PhotoMetadaten(String dateTimeOriginal, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
-		this.aufnahmeZeitpunkt = dateTimeOriginal;
+	public PhotoMetadaten(long aufnahmeZeitpunkt, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
+		this.aufnahmeZeitpunkt = aufnahmeZeitpunkt;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.breite = breite;
@@ -64,10 +64,6 @@ public class PhotoMetadaten {
 		this.s3bucket = s3bucket;
 		this.s3key = s3key;
 		this.zugehoerigkeit = zugehoerigkeit;
-	}
-
-	public String getDateTimeOriginal() {
-		return aufnahmeZeitpunkt;
 	}
 
 	public double getLongitude() {
@@ -86,7 +82,7 @@ public class PhotoMetadaten {
 		return breite;
 	}	
 	
-	public String getAufnahmeZeitpunkt() {
+	public long getAufnahmeZeitpunkt() {
 		return aufnahmeZeitpunkt;
 	}
 

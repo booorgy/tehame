@@ -57,16 +57,7 @@ public class EventPlayground {
 		}
 		
 		// Wenn nichts gefunden wird muss ein neues Event geschaffen werden
-		Event event = new Event();
-		event.setUuid(UUID.randomUUID().toString());
-		event.setLatitudeCenter(lat);
-		event.setLongitudeCenter(lon);
-		event.setLatitudeSum(lat);
-		event.setLongitudeSum(lon);
-		event.setAnzahlPhotos(1);
-		event.setRadius(100); // TODO radius X
-		event.setEnds(0); // TODO umwandeln von metadaten.getDateTimeOriginal()
-		event.setBegins(0); // TODO umwandeln von metadaten.getDateTimeOriginal()
+		Event event = new Event(lon, lat, metadaten.getAufnahmeZeitpunkt());
 		this.speichereEvent(event);
 		
 		metadaten.setEventUuid(event.getUuid());

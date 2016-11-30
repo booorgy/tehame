@@ -1,5 +1,7 @@
 package de.tehame.event;
 
+import java.util.UUID;
+
 /**
  * Events beschreiben ein Ereignis, bei dem ein 
  * oder mehrere Personen beteiligt sind und Photos machen.
@@ -55,6 +57,24 @@ public class Event {
 	 * als die maximale Distanz zwischen dem Mittelpunkt und aller Punkte in der Wolke.
 	 */
 	private double radius = 0L;
+	
+	/**
+	 * Die Metadaten zu einem neuen Event können aus dem Photo übernommen werden.
+	 * @param lon Längengrad.
+	 * @param lat Breitengrad.
+	 * @param aufnahmeZeitpunkt UNIX Timestamp.
+	 */
+	public Event(double lon, double lat, long aufnahmeZeitpunkt) {
+		this.uuid = UUID.randomUUID().toString();
+		this.latitudeCenter = lat;
+		this.longitudeCenter = lon;
+		this.latitudeSum = lat;
+		this.longitudeSum = lon;
+		this.anzahlPhotos = 1;
+		this.radius = 100; // TODO radius X
+		this.ends = aufnahmeZeitpunkt;
+		this.begins = aufnahmeZeitpunkt;
+	}
 	
 	public void berechneNeuenMittelpunkt(double lon, double lat) {
 		this.latitudeSum += lat;

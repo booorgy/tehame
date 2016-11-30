@@ -9,7 +9,7 @@ public class EventTest {
 
 	@Test
 	public void test() {
-		PhotoMetadaten m1 = new PhotoMetadaten("egal", 10, 10, 1920, 1080, "egal", "egal", 0);
+		PhotoMetadaten m1 = new PhotoMetadaten(-1L, 10, 10, 1920, 1080, "egal", "egal", 0);
 		
 		EventPlayground p = new EventPlayground();
 		
@@ -27,7 +27,7 @@ public class EventTest {
 		
 		Assert.assertEquals(e1, e2);
 		
-		PhotoMetadaten m2 = new PhotoMetadaten("egal", 10, 10, 1920, 1080, "egal", "egal", 0);
+		PhotoMetadaten m2 = new PhotoMetadaten(-1L, 10, 10, 1920, 1080, "egal", "egal", 0);
 		p.bestimmeEvent(m2);
 		
 		// Nun sollten es 2 Photos sein
@@ -42,7 +42,7 @@ public class EventTest {
 		
 		// Auch dieses Photo liegt noch im Umkreis von 100 um den Mittelpunkt
 		// sqrt(70*70*2) = 98,99494936611665
-		PhotoMetadaten m3 = new PhotoMetadaten("egal", 80, 80, 1920, 1080, "egal", "egal", 0);
+		PhotoMetadaten m3 = new PhotoMetadaten(-1L, 80, 80, 1920, 1080, "egal", "egal", 0);
 		p.bestimmeEvent(m3);
 		String e3 = m3.getEventUuid();
 		
@@ -52,7 +52,7 @@ public class EventTest {
 		Assert.assertEquals(109d, p.sucheEvent(e3).getRadius(), 0.01d);
 		
 		// Das folgende Photo liegt jedoch außerhalb
-		PhotoMetadaten m4 = new PhotoMetadaten("egal", -90, -90, 1920, 1080, "egal", "egal", 0);
+		PhotoMetadaten m4 = new PhotoMetadaten(-1L, -90, -90, 1920, 1080, "egal", "egal", 0);
 		p.bestimmeEvent(m4);
 		String e4 = m4.getEventUuid();
 		

@@ -5,6 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.commons.imaging.ImageReadException;
@@ -23,11 +27,15 @@ import org.jboss.logging.Logger;
 public class MetadataBuilder {
 
 	private static final Logger LOGGER = Logger.getLogger(MetadataBuilder.class);
+	
+	private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
 	public static PhotoMetadaten getMetaData(final byte[] fileData, int zugehoerigkeit) 
 			throws ImageReadException, IOException {
 		
-		String dateTimeOriginal = null; 
+		// -1 um nicht gesetzte ungültige Werte zu erkennen
+		long dateTimeOriginal = -1; 
 		double longitude = -1; 
 		double latitude = -1;
 		int breite = -1;
@@ -93,7 +101,7 @@ public class MetadataBuilder {
 					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 			
 			if (tiffFieldDateTimeOriginal != null) {
-				dateTimeOriginal = tiffFieldDateTimeOriginal.getValueDescription();
+				dateTimeOriginal = toUnixTimestamp(tiffFieldDateTimeOriginal.getValueDescription());
 			}
 
 			// simple interface to GPS data
@@ -144,5 +152,21 @@ public class MetadataBuilder {
 
         return file;
     }
-
+    
+    public static long toUnixTimestamp(String exifDatum) {
+    	LocalDateTime date = null;
+    	
+    	try {
+    		date = LocalDateTime.parse(exifDatum, DATE_TIME_FORMATTER);
+    	} catch (RuntimeException e) {
+    		LOGGER.error(e);
+    		// TODO Was machen mit Photos ohne Datum oder Geodaten?
+    		return -1;
+    	}
+    	
+    	// TODO Über Timezones gedanken machen, der Client müsste seine Timezone mitschicken,
+    	// denn die steht nicht im Exif.
+    	long timestamp = date.toEpochSecond(ZoneOffset.UTC);
+    	return timestamp;
+    }
 }
