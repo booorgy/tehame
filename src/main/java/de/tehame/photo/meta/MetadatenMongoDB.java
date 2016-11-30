@@ -130,7 +130,7 @@ public class MetadatenMongoDB implements Serializable {
 		while(cursor.hasNext()) {
 			DBObject tobj = cursor.next();
 			PhotoMetadaten photoMetadaten = new PhotoMetadaten(
-					(String) tobj.get("aufnahmeZeitpunkt"), 
+					(long) tobj.get("aufnahmeZeitpunkt"), 
 					(double) tobj.get("longitude"), 
 					(double) tobj.get("latitude"), 
 					(int) tobj.get("breite"), 
