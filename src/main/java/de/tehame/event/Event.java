@@ -72,8 +72,8 @@ public class Event {
 		this.longitudeSum = lon;
 		this.anzahlPhotos = 1;
 		this.radius = 100; // TODO radius X
-		this.ends = aufnahmeZeitpunkt;
-		this.begins = aufnahmeZeitpunkt;
+		this.ends = aufnahmeZeitpunkt + 3600; // TODO zeitlicher Rahmen 
+		this.begins = aufnahmeZeitpunkt - 3600;
 	}
 	
 	public void berechneNeuenMittelpunkt(double lon, double lat) {
