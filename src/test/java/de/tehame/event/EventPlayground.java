@@ -30,8 +30,8 @@ public class EventPlayground {
 			
 			// Folgendes muss mit in das Query
 			// Sind die Metadaten zu alt oder neu für das Event?
-			if (metadaten.getAufnahmeZeitpunkt() <= event.getBegins() - 3600 
-					|| metadaten.getAufnahmeZeitpunkt() >= event.getEnds() + 3600) { // +/- 60 Minuten TODO Wert?
+			if (metadaten.getAufnahmeZeitpunkt() <= event.getBegins() - Event.DIFFERENZ_SEKUNDEN 
+					|| metadaten.getAufnahmeZeitpunkt() >= event.getEnds() + Event.DIFFERENZ_SEKUNDEN) {
 				continue;
 			}
 			
@@ -53,17 +53,17 @@ public class EventPlayground {
 				// Photos die am Rand des Umkreises gemacht werden, 
 				// sollen diesen vergrößern
 				// Achtung: Hier wird getan, als seien es Meter
-				if (distance + 10 > event.getRadius()) {
-					event.setRadius(distance + 10);
+				if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > event.getRadius()) {
+					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
 				}
 				
 				// Erweitere den zeitlichen Rahmen bei Bedarf
-				if (metadaten.getAufnahmeZeitpunkt() - 3600 < event.getBegins()) {
-					event.setBegins(metadaten.getAufnahmeZeitpunkt() - 3600);
+				if (metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN < event.getBegins()) {
+					event.setBegins(metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN);
 				}
 				
-				if (metadaten.getAufnahmeZeitpunkt() + 3600 > event.getEnds()) {
-					event.setEnds(metadaten.getAufnahmeZeitpunkt() + 3600);
+				if (metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN > event.getEnds()) {
+					event.setEnds(metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN);
 				}
 				
 				this.speichereEvent(event);
@@ -107,8 +107,8 @@ public class EventPlayground {
 				// Photos die am Rand des Umkreises gemacht werden, 
 				// sollen diesen vergrößern
 				// Achtung: Hier wird getan, als seien es Meter
-				if (distance + 10 > event.getRadius()) {
-					event.setRadius(distance + 10);
+				if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > event.getRadius()) {
+					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
 					this.speichereEvent(event);
 				}
 				

@@ -11,6 +11,30 @@ import java.util.UUID;
  * liegt zu weit in der Vergangenheit. 
  */
 public class Event {
+	
+	/**
+	 * Wenn ein neues Event erstellt wird, dann definiert das Photo den zeitlichen
+	 * Mittelpunkt. Diese Differenz hier spannt einen zeitlichen Rahmen (+/-) auf,
+	 * in dem ein anderes Photo gemacht sein muss, um zu dem gleichen Event zu
+	 * gehören.
+	 */
+	public static final long DIFFERENZ_SEKUNDEN = 3600L;
+	
+	/**
+	 * Wenn ein neues Event erstellt wird, dann definiert das Photo den räumlichen
+	 * Mittelpunkt. Dieser Radius hier spannt einen *initialen* Umkreis auf,
+	 * in dem ein anderes Photo gemacht sein muss, um zu dem gleichen Event zu
+	 * gehören.
+	 */
+	public static final double RADIUS_WINKEL = 100d; // TODO 100 ist natürlich viel zu viel, hier geht es um das Winkelmaß
+	
+	/**
+	 * Wenn das Photo nahe am Rand innerhalb eines Event-Umkreises gemacht wird,
+	 * dann wird der Radius um diesen Winkel hier erweitert,
+	 * wenn der Umkreis um das Bild mit diesem Radius hier aus dem Umkreis des
+	 * Events herausragt. Der Umkreis des Events muss dann wachsen.
+	 */
+	public static final double RADIUS_ERWEITERUNG_WINKEL = 10d; // TODO 10 ist natürlich viel zu viel, hier geht es um das Winkelmaß
 
 	/**
 	 * UUID des Events.
@@ -71,9 +95,9 @@ public class Event {
 		this.latitudeSum = lat;
 		this.longitudeSum = lon;
 		this.anzahlPhotos = 1;
-		this.radius = 100; // TODO radius X
-		this.ends = aufnahmeZeitpunkt + 3600; // TODO zeitlicher Rahmen 
-		this.begins = aufnahmeZeitpunkt - 3600;
+		this.radius = RADIUS_WINKEL;
+		this.ends = aufnahmeZeitpunkt + DIFFERENZ_SEKUNDEN;
+		this.begins = aufnahmeZeitpunkt - DIFFERENZ_SEKUNDEN;
 	}
 	
 	public void berechneNeuenMittelpunkt(double lon, double lat) {

@@ -68,7 +68,7 @@ public class EventTest {
 	public void testGeoUndZeit() {
 		// 3600, 10, 10
 		// 1h nach 1970
-		PhotoMetadaten m1 = new PhotoMetadaten(3600L, 10, 10, 1920, 1080, "egal", "egal", 0);
+		PhotoMetadaten m1 = new PhotoMetadaten(Event.DIFFERENZ_SEKUNDEN, 10, 10, 1920, 1080, "egal", "egal", 0);
 		
 		EventPlayground p = new EventPlayground();
 		
@@ -126,8 +126,8 @@ public class EventTest {
 		String e4 = m4.getEventUuid();
 		
 		Assert.assertNotEquals(e1, e4);
-		Assert.assertEquals(5000L - 3600L, p.sucheEvent(e4).getBegins());
-		Assert.assertEquals(5000L + 3600L, p.sucheEvent(e4).getEnds());
+		Assert.assertEquals(5000L - Event.DIFFERENZ_SEKUNDEN, p.sucheEvent(e4).getBegins());
+		Assert.assertEquals(5000L + Event.DIFFERENZ_SEKUNDEN, p.sucheEvent(e4).getEnds());
 		
 		// Das folgende Photo liegt (nur) zeitlich außerhalb: 10800+3600=14400
 		PhotoMetadaten m5 = new PhotoMetadaten(14400L, 80, 80, 1920, 1080, "egal", "egal", 0);
@@ -136,7 +136,7 @@ public class EventTest {
 		
 		Assert.assertNotEquals(e1, e5);
 		Assert.assertNotEquals(e4, e5);
-		Assert.assertEquals(14400L - 3600L, p.sucheEvent(e5).getBegins());
-		Assert.assertEquals(14400L + 3600L, p.sucheEvent(e5).getEnds());
+		Assert.assertEquals(14400L - Event.DIFFERENZ_SEKUNDEN, p.sucheEvent(e5).getBegins());
+		Assert.assertEquals(14400L + Event.DIFFERENZ_SEKUNDEN, p.sucheEvent(e5).getEnds());
 	}
 }
