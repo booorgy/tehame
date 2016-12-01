@@ -2,6 +2,8 @@ package de.tehame.event;
 
 import java.util.UUID;
 
+import de.tehame.photo.meta.PhotoMetadaten;
+
 /**
  * Events beschreiben ein Ereignis, bei dem ein 
  * oder mehrere Personen beteiligt sind und Photos machen.
@@ -26,7 +28,7 @@ public class Event {
 	 * in dem ein anderes Photo gemacht sein muss, um zu dem gleichen Event zu
 	 * gehören.
 	 */
-	public static final double RADIUS_WINKEL = 100d; // TODO 100 ist natürlich viel zu viel, hier geht es um das Winkelmaß
+	public static final double RADIUS_INITIAL_WINKEL = 100d; // TODO 100 ist natürlich viel zu viel, hier geht es um das Winkelmaß
 	
 	/**
 	 * Wenn das Photo nahe am Rand innerhalb eines Event-Umkreises gemacht wird,
@@ -84,28 +86,92 @@ public class Event {
 	
 	/**
 	 * Die Metadaten zu einem neuen Event können aus dem Photo übernommen werden.
-	 * @param lon Längengrad.
-	 * @param lat Breitengrad.
-	 * @param aufnahmeZeitpunkt UNIX Timestamp.
+	 * Die Metadaten bekommen eine neue Event UUID zugewiesen.
+	 * 
+	 * @param metadaten Photo Metadaten.
 	 */
-	public Event(double lon, double lat, long aufnahmeZeitpunkt) {
+	public Event(final PhotoMetadaten metadaten) {
+		
+		if (metadaten.getEventUuid() != null) {
+			throw new IllegalArgumentException("Die Metadaten haben bereits eine Event UUID.");
+		}
+		
 		this.uuid = UUID.randomUUID().toString();
-		this.latitudeCenter = lat;
-		this.longitudeCenter = lon;
-		this.latitudeSum = lat;
-		this.longitudeSum = lon;
+		metadaten.setEventUuid(this.uuid);
+		
+		this.latitudeCenter = metadaten.getLatitude();
+		this.longitudeCenter = metadaten.getLongitude();
+		this.latitudeSum = metadaten.getLatitude();
+		this.longitudeSum = metadaten.getLongitude();
 		this.anzahlPhotos = 1;
-		this.radius = RADIUS_WINKEL;
-		this.ends = aufnahmeZeitpunkt + DIFFERENZ_SEKUNDEN;
-		this.begins = aufnahmeZeitpunkt - DIFFERENZ_SEKUNDEN;
+		this.radius = RADIUS_INITIAL_WINKEL;
+		this.ends = metadaten.getAufnahmeZeitpunkt() + DIFFERENZ_SEKUNDEN;
+		this.begins = metadaten.getAufnahmeZeitpunkt() - DIFFERENZ_SEKUNDEN;
 	}
 	
-	public void berechneNeuenMittelpunkt(double lon, double lat) {
-		this.latitudeSum += lat;
-		this.longitudeSum += lon;
+	public void berechneNeuenMittelpunkt(PhotoMetadaten metadaten) {
+		this.latitudeSum += metadaten.getLatitude();
+		this.longitudeSum += metadaten.getLongitude();
 		this.anzahlPhotos++;
 		this.latitudeCenter = this.latitudeSum / this.anzahlPhotos;
 		this.longitudeCenter = this.longitudeSum / this.anzahlPhotos;
+	}
+	
+	/**
+	 * @param metadaten Metadaten.
+	 * @return Die Distanz zwischen dem Event Mittelpunkt und der Photo Geolocation.
+	 */
+	protected double berechneDistanzZumMittelpunkt(PhotoMetadaten metadaten) {
+		final double diffLat = metadaten.getLatitude() - this.getLatitudeCenter();
+		final double diffLon = metadaten.getLongitude() - this.getLongitudeCenter();
+		final double distanceX = Math.sqrt(diffLat * diffLat + diffLon * diffLon);
+		return distanceX;
+	}
+
+	/**
+	 * Wenn die Distanz d der Photo Location zum Mittelpunkt des Events
+	 * plus der Radius Erweiterung im Winkelmaß größer ist als der 
+	 * aktuelle Radius des Umkreises des Events ist, dann vergrößere
+	 * diesen auf diese Distanz d.
+	 * 
+	 * @param distance Distanz des Photos zum Mittelpunkt.
+	 */
+	protected void erweitereUmkreis(final double distance) {
+		if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > this.getRadius()) {
+			this.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
+		}
+	}
+
+	/**
+	 * Wenn das Aufnahmedatum des Photos minus der Differenz in Sekunden älter ist,
+	 * als der Beginn des Events, dann setze den Beginn des Events auf diesen Zeitpunkt.
+	 * Analog dazu: Wenn das Aufnahmedatum des Photos plus der Differenz in Sekunden
+	 * neuer ist als das Ende des Events, dann setze das Ende auf diesen Zeitpunkt.
+	 * 
+	 * @param metadaten Photo Metadaten.
+	 */
+	protected void erweitereZeitlichenRahmen(final PhotoMetadaten metadaten) {
+		if (metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN < this.getBegins()) {
+			this.setBegins(metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN);
+		}
+		
+		if (metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN > this.getEnds()) {
+			this.setEnds(metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN);
+		}
+	}
+	
+	/**
+	 * Liegt der Aufnahmezeitpunkt im folgenden Bereich?
+	 * 
+	 *     [----------------------------|---------|----------------------------]
+	 *     ^ Beginn - Differenz         ^ Beginn  ^ Ende      Ende + Differenz ^
+	 *     
+	 * @param metadaten Photo Metadaten.
+	 * @return Ob der Aufnahmezeitpunkt zu diesem Event passt.
+	 */
+	protected boolean istZeitlichPassend(PhotoMetadaten metadaten) {
+		return metadaten.getAufnahmeZeitpunkt() > this.getBegins() - Event.DIFFERENZ_SEKUNDEN 
+				&& metadaten.getAufnahmeZeitpunkt() < this.getEnds() + Event.DIFFERENZ_SEKUNDEN;
 	}
 
 	public String getUuid() {

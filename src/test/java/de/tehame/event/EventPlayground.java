@@ -47,7 +47,7 @@ public class EventPlayground {
 				metadaten.setEventUuid(event.getUuid());
 				
 				// Berechne den Mittelpunkt neu
-				event.berechneNeuenMittelpunkt(lon, lat);
+				event.berechneNeuenMittelpunkt(metadaten);
 				
 				// Bei Bedarf erweitere den Radius um X
 				// Photos die am Rand des Umkreises gemacht werden, 
@@ -73,10 +73,8 @@ public class EventPlayground {
 		}
 		
 		// Wenn nichts gefunden wird muss ein neues Event geschaffen werden
-		Event event = new Event(lon, lat, metadaten.getAufnahmeZeitpunkt());
+		Event event = new Event(metadaten);
 		this.speichereEvent(event);
-		
-		metadaten.setEventUuid(event.getUuid());
 		
 		return metadaten;
 	}
@@ -101,7 +99,7 @@ public class EventPlayground {
 				metadaten.setEventUuid(event.getUuid());
 				
 				// Berechne den Mittelpunkt neu
-				event.berechneNeuenMittelpunkt(lon, lat);
+				event.berechneNeuenMittelpunkt(metadaten);
 				
 				// Bei Bedarf erweitere den Radius um X
 				// Photos die am Rand des Umkreises gemacht werden, 
@@ -117,10 +115,8 @@ public class EventPlayground {
 		}
 		
 		// Wenn nichts gefunden wird muss ein neues Event geschaffen werden
-		Event event = new Event(lon, lat, metadaten.getAufnahmeZeitpunkt());
+		Event event = new Event(metadaten);
 		this.speichereEvent(event);
-		
-		metadaten.setEventUuid(event.getUuid());
 		
 		return metadaten;
 	}
