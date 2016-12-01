@@ -46,5 +46,33 @@ CREATE TABLE `relation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relationen werden bidirektional doppelt gespeichert: A -> B und B -> A';
 
 -- Admin_A und Admin_B sind Freunde
-INSERT INTO `tehame`.`relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'e26fc393-9219-44b5-b681-f08f054a79eb', '1');
-INSERT INTO `tehame`.`relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'e26fc393-9219-44b5-b681-f08f054a79ea', '1');
+INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'e26fc393-9219-44b5-b681-f08f054a79eb', '1');
+INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'e26fc393-9219-44b5-b681-f08f054a79ea', '1');
+
+CREATE TABLE `event` (
+  `uuid` varchar(255) NOT NULL,
+  `begins` bigint(20) NOT NULL,
+  `ends` bigint(20) NOT NULL,
+  `longitudeSum` double NOT NULL,
+  `latitudeSum` double NOT NULL,
+  `longitudeCenter` double NOT NULL,
+  `latitudeCenter` double NOT NULL,
+  `anzahlPhotos` int(11) NOT NULL,
+  `radius` double NOT NULL,
+  PRIMARY KEY (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `event` VALUES ('e26fc393-9219-44b5-b681-f08f054a79ex', '0', '0', '0', '0', '0', '0', '1', '0.5');
+INSERT INTO `event` VALUES ('e26fc393-9219-44b5-b681-f08f054a79ey', '0', '0', '0', '0', '0', '0', '1', '0.5');
+
+CREATE TABLE `userevent` (
+  `useruuid` varchar(255) NOT NULL,
+  `eventuuid` varchar(255) NOT NULL,
+  PRIMARY KEY (`useruuid`,`eventuuid`),
+  KEY `fk_event` (`eventuuid`),
+  CONSTRAINT `fk_event` FOREIGN KEY (`eventuuid`) REFERENCES `event` (`uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user` FOREIGN KEY (`useruuid`) REFERENCES `user` (`uuid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `userevent` VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'e26fc393-9219-44b5-b681-f08f054a79ex');
+INSERT INTO `userevent` VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'e26fc393-9219-44b5-b681-f08f054a79ey');

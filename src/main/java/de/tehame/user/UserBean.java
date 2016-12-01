@@ -1,5 +1,9 @@
 package de.tehame.user;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
 import javax.ejb.SessionContext;
@@ -12,6 +16,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.jboss.crypto.CryptoUtil;
+
+import de.tehame.event.Event;
 
 @Stateless
 @LocalBean
@@ -97,5 +103,21 @@ public class UserBean {
 		authenticated = user.getPasswort().equals(passwortHash);
 		
 		return authenticated;
+	}
+	
+	/**
+	 * @param user User.
+	 * @return Alle Relation eines Users.
+	 */
+	public List<String> sucheRelationen(User user) {
+		User u = this.em.find(User.class, user.getUuid());
+		List<Relation> relations = u.getRelations1();
+		List<String> uuids = new ArrayList<String>(relations.size());
+		
+		for (Relation r : relations) {
+			uuids.add(r.getId().getUuiduserb());
+		}
+		
+		return uuids;
 	}
 }

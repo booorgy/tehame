@@ -28,11 +28,12 @@ import org.jboss.logging.Logger;
 import de.tehame.photo.meta.MetadataBuilder;
 import de.tehame.photo.meta.MetadatenMongoDB;
 import de.tehame.photo.meta.PhotoMetadaten;
+import de.tehame.security.SecurableEndpoint;
 import de.tehame.user.User;
 import de.tehame.user.UserBean;
 
 @Path("v1/photos")
-public class PhotosV1RS {
+public class PhotosV1RS extends SecurableEndpoint {
 	
 	private static final Logger LOGGER = Logger.getLogger(PhotosV1RS.class);
 	
@@ -86,7 +87,7 @@ public class PhotosV1RS {
 	 * Liefert ein Photo aus für Clients, die sich über Header authentifizieren. 
 	 * 
 	 * Beispiel Curl:
-	 * curl http://localhost:8080/tehame/rest/v1/photos/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd -v -H "email: admin@tehame.de" -H "passwort: a"
+	 * curl http://localhost:8080/tehame/rest/v1/photos/tehame/b533e8f7-5fdd-484e-8a06-f24d3cf643cd -v -H "email: admin_a@tehame.de" -H "passwort: a"
 	 * 
 	 * @param bucketName S3 Bucket Name aus URI.
 	 * @param objectKey S3 Object Key aus URI.
@@ -104,7 +105,7 @@ public class PhotosV1RS {
 			@HeaderParam("passwort") final String passwort) {
 		
 		User user = this.userBean.sucheUser(email);
-		this.auth(user, passwort);
+		this.auth(user, passwort, this.userBean);
 		
 		LOGGER.trace("Request von User '" + email + "' zu Photo '" 
 				+ bucketName + "/" + objectKey + "'");
@@ -138,12 +139,6 @@ public class PhotosV1RS {
 		}).build();
 	}
 
-	private void auth(User user, String passwort) {
-		if (!this.userBean.authenticated(user, passwort)) {
-			throw new WebApplicationException(Status.UNAUTHORIZED);
-		}
-	}
-
 	/**
 	 * @return Der Name des angemeldeten Benutzers.
 	 */
@@ -164,7 +159,7 @@ public class PhotosV1RS {
 	 * Speichert ein neues Photo.
 	 * 
 	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 0" -H "email: admin@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 0" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.
@@ -185,7 +180,7 @@ public class PhotosV1RS {
 				+ email + ", passwort: " + passwort);
 		
 		User user = this.userBean.sucheUser(email);
-		this.auth(user, passwort);
+		this.auth(user, passwort, this.userBean);
 		
 		// TODO prüfen, dass upload ein bild ist und nicht ausführbar etc. (MetaDaten Angriffe)
 		

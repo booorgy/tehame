@@ -6,9 +6,16 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.jboss.crypto.CryptoUtil;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import de.tehame.event.Event;
 
 /**
  * JPA Entity für MySQL DB.
@@ -28,19 +35,43 @@ public class User implements Serializable {
 	@Id
 	private String uuid;
 	private String email;
+	
+	/**
+	 * SHA-256 Base64 Hash.
+	 * Der JSON Mapper soll den Hash niemals mit in das JSON übernehmen.
+	 */
+	@JsonIgnore
 	private String passwort;
 	
 	/**
 	 * Bidirektionale Beziehung (1:N) zu Relation. (Lazy Loading ist wichtig)
+	 * Der JSON Mapper soll das ignorieren, sonst landet er in einer Endlosschleife.
 	 */
 	@OneToMany(mappedBy="user1")
 	private List<Relation> relations1;
 
 	/**
 	 * Bidirektionale Beziehung (1:N) zu Relation. (Lazy Loading ist wichtig)
+	 * Der JSON Mapper soll das ignorieren, sonst landet er in einer Endlosschleife.
 	 */
 	@OneToMany(mappedBy="user2")
 	private List<Relation> relations2;
+	
+	/**
+	 * Bidirektional N:N, die User zu diesem Event.
+	 * Der JSON Mapper soll das ignorieren, sonst landet er in einer Endlosschleife.
+	 */
+	@ManyToMany
+	@JoinTable(
+		name="userevent"
+		, joinColumns={
+			@JoinColumn(name="useruuid")
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="eventuuid")
+			}
+		)
+	private List<Event> events;
 	
 	/**
 	 * Default Constructor für JPA.
@@ -84,35 +115,19 @@ public class User implements Serializable {
 	public void setRelations1(List<Relation> relations1) {
 		this.relations1 = relations1;
 	}
-	public Relation addRelations1(Relation relations1) {
-		getRelations1().add(relations1);
-		relations1.setUser1(this);
-
-		return relations1;
-	}
-	public Relation removeRelations1(Relation relations1) {
-		getRelations1().remove(relations1);
-		relations1.setUser1(null);
-
-		return relations1;
-	}
 	public List<Relation> getRelations2() {
 		return this.relations2;
 	}
 	public void setRelations2(List<Relation> relations2) {
 		this.relations2 = relations2;
 	}
-	public Relation addRelations2(Relation relations2) {
-		getRelations2().add(relations2);
-		relations2.setUser2(this);
-
-		return relations2;
+	
+	public List<Event> getEvents() {
+		return this.events;
 	}
-	public Relation removeRelations2(Relation relations2) {
-		getRelations2().remove(relations2);
-		relations2.setUser2(null);
 
-		return relations2;
+	public void setEvents(List<Event> events) {
+		this.events = events;
 	}
 
 	@Override
@@ -120,6 +135,7 @@ public class User implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((events == null) ? 0 : events.hashCode());
 		result = prime * result + ((passwort == null) ? 0 : passwort.hashCode());
 		result = prime * result + ((relations1 == null) ? 0 : relations1.hashCode());
 		result = prime * result + ((relations2 == null) ? 0 : relations2.hashCode());
@@ -140,6 +156,11 @@ public class User implements Serializable {
 			if (other.email != null)
 				return false;
 		} else if (!email.equals(other.email))
+			return false;
+		if (events == null) {
+			if (other.events != null)
+				return false;
+		} else if (!events.equals(other.events))
 			return false;
 		if (passwort == null) {
 			if (other.passwort != null)

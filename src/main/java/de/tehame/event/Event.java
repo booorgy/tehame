@@ -1,8 +1,15 @@
 package de.tehame.event;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
 import de.tehame.photo.meta.PhotoMetadaten;
+import de.tehame.user.User;
 
 /**
  * Events beschreiben ein Ereignis, bei dem ein 
@@ -12,8 +19,10 @@ import de.tehame.photo.meta.PhotoMetadaten;
  * gehören zu dem Event, außer dieses Event liegt zu weit in der Vergangenheit oder das Photo
  * liegt zu weit in der Vergangenheit. 
  */
-public class Event {
-	
+@Entity(name = "event")
+public class Event implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Wenn ein neues Event erstellt wird, dann definiert das Photo den zeitlichen
 	 * Mittelpunkt. Diese Differenz hier spannt einen zeitlichen Rahmen (+/-) auf,
@@ -41,6 +50,7 @@ public class Event {
 	/**
 	 * UUID des Events.
 	 */
+	@Id
 	private String uuid = null;
 	
 	/**
@@ -83,6 +93,17 @@ public class Event {
 	 * als die maximale Distanz zwischen dem Mittelpunkt und aller Punkte in der Wolke.
 	 */
 	private double radius = 0L;
+	
+	/**
+	 * Bidirektional N:N, die User zu diesem Event.
+	 */
+	@ManyToMany(mappedBy="events")
+	private List<User> users;
+	
+	/**
+	 * @deprecated Standardkonstruktor für JPA.
+	 */
+	public Event() { super(); }
 	
 	/**
 	 * Die Metadaten zu einem neuen Event können aus dem Photo übernommen werden.
@@ -244,5 +265,74 @@ public class Event {
 
 	public void setAnzahlPhotos(int anzahlPhotos) {
 		this.anzahlPhotos = anzahlPhotos;
+	}
+	
+	public List<User> getUsers() {
+		return this.users;
+	}
+
+	public void setUsers(List<User> users) {
+		this.users = users;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + anzahlPhotos;
+		result = prime * result + (int) (begins ^ (begins >>> 32));
+		result = prime * result + (int) (ends ^ (ends >>> 32));
+		long temp;
+		temp = Double.doubleToLongBits(latitudeCenter);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(latitudeSum);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(longitudeCenter);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(longitudeSum);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(radius);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((users == null) ? 0 : users.hashCode());
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Event other = (Event) obj;
+		if (anzahlPhotos != other.anzahlPhotos)
+			return false;
+		if (begins != other.begins)
+			return false;
+		if (ends != other.ends)
+			return false;
+		if (Double.doubleToLongBits(latitudeCenter) != Double.doubleToLongBits(other.latitudeCenter))
+			return false;
+		if (Double.doubleToLongBits(latitudeSum) != Double.doubleToLongBits(other.latitudeSum))
+			return false;
+		if (Double.doubleToLongBits(longitudeCenter) != Double.doubleToLongBits(other.longitudeCenter))
+			return false;
+		if (Double.doubleToLongBits(longitudeSum) != Double.doubleToLongBits(other.longitudeSum))
+			return false;
+		if (Double.doubleToLongBits(radius) != Double.doubleToLongBits(other.radius))
+			return false;
+		if (users == null) {
+			if (other.users != null)
+				return false;
+		} else if (!users.equals(other.users))
+			return false;
+		if (uuid == null) {
+			if (other.uuid != null)
+				return false;
+		} else if (!uuid.equals(other.uuid))
+			return false;
+		return true;
 	}
 }
