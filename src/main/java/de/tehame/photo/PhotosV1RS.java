@@ -25,6 +25,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
+import de.tehame.TehameProperties;
 import de.tehame.photo.meta.MetadataBuilder;
 import de.tehame.photo.meta.MetadatenMongoDB;
 import de.tehame.photo.meta.PhotoMetadaten;
@@ -79,7 +80,7 @@ public class PhotosV1RS {
 		LOGGER.trace("Request von User '" + this.getUserName() + "' zu Photo '" 
 				+ bucketName + "/" + objectKey + "'");
 		
-		return this.erstellePhotoResponse(PhotosS3.BUCKET_PHOTOS, objectKey);
+		return this.erstellePhotoResponse(bucketName, objectKey + "-thumbnail");
 	}
 	
 	/**

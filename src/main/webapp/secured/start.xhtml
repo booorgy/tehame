@@ -7,8 +7,38 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">	
 <h:body>
 	<h:form>
-		<h:commandLink action="privat.xhtml" value="Privat" />
-		<h:commandLink action="familie.xhtml" value="Familie" />
+		<table align="center">
+			<tr>
+				<td>
+					<h:commandLink action="privat.xhtml" value="">
+						<h:graphicImage value="../resources/images/privat.png" width="48"/>
+					</h:commandLink>				
+				</td>
+				<td>
+					<h:commandLink action="familie.xhtml" value="">
+						<h:graphicImage value="../resources/images/familie.jpg" width="48"/>
+					</h:commandLink>				
+				</td>
+				<td>
+					<h:commandLink action="freunde.xhtml" value="">
+						<h:graphicImage value="../resources/images/freunde.png" width="48"/>
+					</h:commandLink>					
+				</td>								
+			</tr>
+		</table>
+		<div align="center" style="text-align: center;">
+			<p>
+				<span style="font-size:26px"><strong>Te</strong>ilen<strong>Ha</strong>ben<strong>Me</strong>ins...</span>
+			</p>
+			<p>
+				... teilt Fotos zwischen:
+			</p>
+			<p>
+			  <h:graphicImage value="../resources/images/privat.png" width="22"/> Partnern<br/>
+			  <h:graphicImage value="../resources/images/familie.jpg" width="22"/> Familie<br/>
+			  <h:graphicImage value="../resources/images/freunde.png" width="22"/> Freunden<br/>
+			</p>
+		</div>
 	</h:form>
 </h:body>
 </html>

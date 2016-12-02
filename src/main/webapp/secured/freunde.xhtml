@@ -37,12 +37,12 @@
 				</td>
 				<td>
 					<h:commandLink action="familie.xhtml" value="">
-						<h:graphicImage value="../resources/images/familie.jpg" width="128"/>
+						<h:graphicImage value="../resources/images/familie.jpg" width="48"/>
 					</h:commandLink>				
 				</td>
 				<td>
 					<h:commandLink action="freunde.xhtml" value="">
-						<h:graphicImage value="../resources/images/freunde.png" width="48"/>
+						<h:graphicImage value="../resources/images/freunde.png" width="128"/>
 					</h:commandLink>					
 				</td>								
 			</tr>
@@ -50,7 +50,7 @@
 	</h:form>
 	<h:form>
 		<div class="img150">
-			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(1)}" var="pic">
+			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(2)}" var="pic">
 				<img class="lazy" data-src="#{pic}"/>
 			</ui:repeat>		
 		</div>		

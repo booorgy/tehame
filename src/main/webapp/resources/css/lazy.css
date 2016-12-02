@@ -1,5 +1,4 @@
 img.lazy {
-	height: 600px;
     background-image: url('../resources/images/loading.gif');
     background-repeat: no-repeat;
     background-position: 50% 50%;	

@@ -28,7 +28,27 @@
 </h:head>
 <h:body>
 	<h:form>
-		<h:commandLink action="start.xhtml" value="zurück" />
+		<table align="center">
+			<tr>
+				<td>
+					<h:commandLink action="privat.xhtml" value="">
+						<h:graphicImage value="../resources/images/privat.png" width="128"/>
+					</h:commandLink>				
+				</td>
+				<td>
+					<h:commandLink action="familie.xhtml" value="">
+						<h:graphicImage value="../resources/images/familie.jpg" width="48"/>
+					</h:commandLink>				
+				</td>
+				<td>
+					<h:commandLink action="freunde.xhtml" value="">
+						<h:graphicImage value="../resources/images/freunde.png" width="48"/>
+					</h:commandLink>					
+				</td>								
+			</tr>
+		</table>		
+	</h:form>
+	<h:form>
 		<div class="img150">
 			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(0)}" var="pic">
 				<img class="lazy" data-src="#{pic}"/>
