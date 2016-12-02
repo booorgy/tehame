@@ -48,8 +48,13 @@
 			</tr>
 		</table>		
 	</h:form>
-	<h:form>
-		
+	<h:form>0:
+			<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(0)}" var="event">
+				<h:outputLabel value="#{event.ends}" />
+			</ui:repeat>1:	
+			<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(1)}" var="event">
+				<h:outputLabel value="#{event.ends}" />
+			</ui:repeat>		
 			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(1)}" var="pic">
 				<div class="img150"><img class="lazy" data-src="#{pic}"/></div>
 			</ui:repeat>		

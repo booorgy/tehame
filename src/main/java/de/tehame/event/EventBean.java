@@ -28,7 +28,7 @@ public class EventBean {
 	 * @param user User.
 	 * @return Alle Events eines Users und dessen Relationen (1st Level).
 	 */
-	public List<Event> sucheEvents(User user) { // TODO test
+	public List<Event> sucheEvents(User user, int zugehoerigkeit) { // TODO test
 		User u = this.em.find(User.class, user.getUuid());
 		List<Relation> relations = u.getRelations1();
 		
@@ -37,11 +37,12 @@ public class EventBean {
 		
 		// FIXME Ugly N+1 Problem
 		for (Relation r : relations) {
-			uuids.add(r.getUser2().getUuid());
+			if (r.getId().getType() == zugehoerigkeit)
+				uuids.add(r.getUser2().getUuid());
 		}
 		
 		TypedQuery<Event> query = this.em.createQuery(
-				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids", 
+				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids order by e.ends desc", 
 				Event.class)
 				.setParameter("useruuids", uuids);
 		List<Event> events = query.getResultList();
@@ -60,10 +61,10 @@ public class EventBean {
 		if (metadaten.getEventUuid() != null) {
 			throw new IllegalArgumentException("Die Metadaten haben bereits eine Event UUID.");
 		}
-		
+		 
 		// TODO es müssen nicht alle Events abgefragt werden, es reichen die, 
 		// mit dem entsprechenden Alter wie in den Metadaten des Photos
-		for (Event event : this.sucheEvents(user)) {
+		for (Event event : this.sucheEvents(user, metadaten.getZugehoerigkeit())) {
 			
 			// Folgendes muss mit in das Query
 			// Sind die Metadaten zu alt oder neu für das Event?
