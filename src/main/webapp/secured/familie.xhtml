@@ -49,11 +49,11 @@
 		</table>		
 	</h:form>
 	<h:form>
-		<div class="img150">
+		
 			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(1)}" var="pic">
-				<img class="lazy" data-src="#{pic}"/>
+				<div class="img150"><img class="lazy" data-src="#{pic}"/></div>
 			</ui:repeat>		
-		</div>		
+				
 	</h:form>
 </h:body>
 </html>

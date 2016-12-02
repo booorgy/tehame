@@ -70,7 +70,12 @@ public class MetadatenMongoDB implements Serializable {
 	    photo.put("s3bucket", s3bucket);
 	    photo.put("longitude", metadaten.getLongitude());
 	    photo.put("latitude", metadaten.getLatitude());
-	    photo.put("aufnahmeZeitpunkt", String.valueOf(new Timestamp(new Date().getTime())));	
+	    if (metadaten.getAufnahmeZeitpunkt() == -1) {
+	    	Date currentDate = new Date();
+	    	photo.put("aufnahmeZeitpunkt", (currentDate.getTime() / 1000));	
+	    } else {
+	    	photo.put("aufnahmeZeitpunkt", metadaten.getAufnahmeZeitpunkt());		
+	    }
 	    photo.put("useruuid", user.getUuid());	
 	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
 	    photo.put("breite", metadaten.getBreite());	

@@ -81,7 +81,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 		LOGGER.trace("Request von User '" + this.getUserName() + "' zu Photo '" 
 				+ bucketName + "/" + objectKey + "'");
 		
-		return this.erstellePhotoResponse(bucketName, objectKey + "-thumbnail");
+		return this.erstellePhotoResponse(bucketName, objectKey);
 	}
 	
 	/**
