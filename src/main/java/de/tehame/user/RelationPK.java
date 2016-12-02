@@ -13,6 +13,9 @@ public class RelationPK implements Serializable {
 	@Column(insertable=false, updatable=false)
 	private String uuiduserb;
 
+	/**
+	 * Der Beziehungstyp (Familie, Freund, Partner).
+	 */
 	private int type;
 
 	public RelationPK() {
