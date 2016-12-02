@@ -65,11 +65,20 @@ public class MetadatenMongoDB implements Serializable {
 		
 		DBCollection photos = loadConnectMongoCollection("picture");
 	   
+		// Erzeuge Photo Metadaten Objekt
 	    BasicDBObject photo = new BasicDBObject();
 	    photo.put("s3key", s3key);
 	    photo.put("s3bucket", s3bucket);
-	    photo.put("longitude", metadaten.getLongitude());
-	    photo.put("latitude", metadaten.getLatitude());
+	    
+	    // Erzeuge GeoJSON Objekt
+	    BasicDBObject location = new BasicDBObject();
+	    location.put("type", "Point");
+	    double[] geoPoint = new double[2];
+	    geoPoint[0] = metadaten.getLongitude();
+	    geoPoint[1] = metadaten.getLatitude();
+	    location.put("coordinates", geoPoint);
+	    
+	    photo.put("loc", location);
 	    if (metadaten.getAufnahmeZeitpunkt() == -1) {
 	    	Date currentDate = new Date();
 	    	photo.put("aufnahmeZeitpunkt", (currentDate.getTime() / 1000));	
@@ -80,7 +89,10 @@ public class MetadatenMongoDB implements Serializable {
 	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
 	    photo.put("breite", metadaten.getBreite());	
 	    photo.put("hoehe", metadaten.getHoehe());	
-	    photos.insert(photo);	    
+	    
+	    LOGGER.trace("Speichere Metadaten in MongoDB: " + photo.toJson());
+	    
+	    photos.insert(photo);
 	    
 	    //closeMongoConnection();
 	    LOGGER.trace("Details zu Photo mit S3 Key '" + s3key + "' in MondoDB gespeichert.");
