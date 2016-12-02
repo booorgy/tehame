@@ -2,7 +2,6 @@ package de.tehame.photo.meta;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,7 +17,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import de.tehame.TehameProperties;
-import de.tehame.photo.Zugehoerigkeit;
 import de.tehame.user.User;
 
 /**
@@ -51,23 +49,16 @@ public class MetadatenMongoDB implements Serializable {
 	/**
 	 * Speichert Details und Metadaten zu einem Photo in der MongoDB.
 	 * 
-	 * @param user Tehame User.
-	 * @param s3key S3 Object Key.
-	 * @param s3bucket S3 Bucket Name.
 	 * @param metadaten Photo Metadaten.
 	 * @throws IOException I/O Fehler.
 	 */
-	public void savePhotoDetailsToMongo(
-			final User user, 
-			final String s3key, 
-			final String s3bucket, 
-			final PhotoMetadaten metadaten) 
+	public void savePhotoDetailsToMongo(final PhotoMetadaten metadaten) 
 			throws IOException {		
 		
 		// Erzeuge Photo Metadaten Objekt
 	    BasicDBObject photo = new BasicDBObject();
-	    photo.put("s3key", s3key);
-	    photo.put("s3bucket", s3bucket);
+	    photo.put("s3key", metadaten.getS3key());
+	    photo.put("s3bucket", metadaten.getS3bucket());
 	    
 	    // Erzeuge GeoJSON Objekt
 	    BasicDBObject location = new BasicDBObject();
@@ -84,7 +75,7 @@ public class MetadatenMongoDB implements Serializable {
 	    } else {
 	    	photo.put("aufnahmeZeitpunkt", metadaten.getAufnahmeZeitpunkt());		
 	    }
-	    photo.put("useruuid", user.getUuid());	
+	    photo.put("useruuid", metadaten.getUserUuid());	
 	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
 	    photo.put("breite", metadaten.getBreite());	
 	    photo.put("hoehe", metadaten.getHoehe());	
@@ -95,7 +86,7 @@ public class MetadatenMongoDB implements Serializable {
 	    photos.insert(photo);
 	    
 	    //closeMongoConnection();
-	    LOGGER.trace("Details zu Photo mit S3 Key '" + s3key + "' in MondoDB gespeichert.");
+	    LOGGER.trace("Details zu Photo mit S3 Key '" + metadaten.getS3key() + "' in MondoDB gespeichert.");
 	}
 	
 	/**

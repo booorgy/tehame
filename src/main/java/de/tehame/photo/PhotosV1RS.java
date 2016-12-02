@@ -26,6 +26,7 @@ import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
 import de.tehame.TehameProperties;
+import de.tehame.event.EventBean;
 import de.tehame.photo.meta.MetadataBuilder;
 import de.tehame.photo.meta.MetadatenMongoDB;
 import de.tehame.photo.meta.PhotoMetadaten;
@@ -37,18 +38,11 @@ import de.tehame.user.UserBean;
 public class PhotosV1RS extends SecurableEndpoint {
 	
 	private static final Logger LOGGER = Logger.getLogger(PhotosV1RS.class);
-	
-	@Context 
-	private SecurityContext securityContext;
-	
-	@Inject
-	private UserBean userBean;
-	
-	@Inject
-	private MetadatenMongoDB metadatenDB;
-	
-	@Inject
-	private PhotosS3 photosS3;
+	@Context private SecurityContext securityContext;
+	@Inject private UserBean userBean;
+	@Inject private EventBean eventBean;
+	@Inject private MetadatenMongoDB metadatenDB;
+	@Inject private PhotosS3 photosS3;
 
 	@GET
 	@Path("ping")
@@ -160,7 +154,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 	 * Speichert ein neues Photo.
 	 * 
 	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 0" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 1" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.
@@ -191,10 +185,16 @@ public class PhotosV1RS extends SecurableEndpoint {
 		
 		if (fileData != null && fileData.length != 0) {
 			
+			try {
+				s3key = this.photosS3.speicherePhoto(fileData);
+			} catch (Exception e) {
+				LOGGER.error("Konnte Object nicht in S3 speichern.", e);
+			}
+			
 			PhotoMetadaten metadaten = null;
 			
 			try {
-				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user);
+				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user, s3key);
 			} catch (ImageReadException e) {
 				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -203,14 +203,11 @@ public class PhotosV1RS extends SecurableEndpoint {
 				throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
 			}
 			
-			try {
-				s3key = this.photosS3.speicherePhoto(fileData);
-			} catch (Exception e) {
-				LOGGER.error("Konnte Object nicht in S3 speichern.", e);
-			}
+			// Ordne das Photo einem existierenden oder neuen Event zu
+			this.eventBean.eventZuordnung(metadaten, user);
 			
 			try {
-				this.metadatenDB.savePhotoDetailsToMongo(user, s3key, PhotosS3.BUCKET_PHOTOS, metadaten);
+				this.metadatenDB.savePhotoDetailsToMongo(metadaten);
 			} catch (Exception e) {
 				LOGGER.error("Konnte Photo Details nicht in MongoDB speichern.", e);
 			}

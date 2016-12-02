@@ -1,5 +1,6 @@
 package de.tehame.event;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+
+import org.jboss.logging.Logger;
 
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.Relation;
@@ -19,6 +22,8 @@ public class EventBean {
 	
 	@PersistenceContext(unitName = "tehamePU")
 	private EntityManager em;
+	
+	private static final Logger LOGGER = Logger.getLogger(EventBean.class);
 	
 	/**
 	 * Sucht alle Events, die ein Benutzer sehen darf. Das sind die Events,
@@ -42,7 +47,7 @@ public class EventBean {
 		}
 		
 		TypedQuery<Event> query = this.em.createQuery(
-				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids order by e.ends desc", 
+				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids ORDER BY e.ends DESC", 
 				Event.class)
 				.setParameter("useruuids", uuids);
 		List<Event> events = query.getResultList();
@@ -58,7 +63,13 @@ public class EventBean {
 	 */
 	public PhotoMetadaten eventZuordnung(PhotoMetadaten metadaten, User user) {
 		
+		if (metadaten.getS3key() == null) {
+			LOGGER.error("Die Metadaten haben keinen S3 Key.");
+			throw new IllegalArgumentException("Die Metadaten haben keinen S3 Key.");
+		}
+		
 		if (metadaten.getEventUuid() != null) {
+			LOGGER.error("Die Metadaten haben bereits eine Event UUID.");
 			throw new IllegalArgumentException("Die Metadaten haben bereits eine Event UUID.");
 		}
 		 
@@ -69,6 +80,7 @@ public class EventBean {
 			// Folgendes muss mit in das Query
 			// Sind die Metadaten zu alt oder neu für das Event?
 			if (!event.istZeitlichPassend(metadaten)) {
+				LOGGER.trace("Das Photo " + metadaten.getS3key() + " passt zeitlich nicht zu dem Event " + event.getUuid());
 				continue;
 			}
 			
@@ -93,7 +105,14 @@ public class EventBean {
 				// Erweitere den zeitlichen Rahmen bei Bedarf
 				event.erweitereZeitlichenRahmen(metadaten);
 				
+				LOGGER.trace("Das Photo " + metadaten.getS3key() + " wurde dem Event " + event.getUuid() + " zugeordnet");
+				
 				this.em.merge(event);
+				
+				// Falls noch nicht vorhanden, ordne das Event dem User zu
+				if (!event.getUsers().contains(user)) {
+					this.verknuepfeUserUndEvent(user, event);
+				}
 				
 				return metadaten;
 			}
@@ -101,8 +120,19 @@ public class EventBean {
 		
 		// Wenn nichts gefunden wird muss ein neues Event geschaffen werden
 		Event event = new Event(metadaten);
+		LOGGER.trace("Für das Photo " + metadaten.getS3key() + " wurde das neue Event " + event.getUuid() + " geschaffen");
 		this.em.persist(event);
 		
+		// Ordne das Event dem User zu
+		this.verknuepfeUserUndEvent(user, event);
+		
 		return metadaten;
+	}
+
+	private void verknuepfeUserUndEvent(User user, Event event) {
+		user = this.em.find(User.class, user.getUuid());
+		user.getEvents().add(event);
+		LOGGER.trace("Das Event " + event.getUuid() + " wird dem User " + user.getUuid() + " zugeordnet");
+		this.em.merge(user);
 	}
 }

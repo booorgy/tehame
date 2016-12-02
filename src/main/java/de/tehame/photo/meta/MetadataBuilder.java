@@ -1,11 +1,6 @@
 package de.tehame.photo.meta;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -24,16 +19,20 @@ import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.jboss.logging.Logger;
 
+import de.tehame.TehameProperties;
 import de.tehame.user.User;
 
 public class MetadataBuilder {
 
 	private static final Logger LOGGER = Logger.getLogger(MetadataBuilder.class);
 	
+	/**
+	 * Beispiel DateTimeOriginal: '2016:06:13 17:06:23'.
+	 */
 	private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-	public static PhotoMetadaten createMetaData(final byte[] fileData, int zugehoerigkeit, User user) 
+	public static PhotoMetadaten createMetaData(final byte[] fileData, int zugehoerigkeit, User user, String s3key) 
 			throws ImageReadException, IOException {
 		
 		// -1 um nicht gesetzte ungültige Werte zu erkennen
@@ -128,7 +127,8 @@ public class MetadataBuilder {
 			}
 		}
 		
-		final PhotoMetadaten metaDaten = new PhotoMetadaten(user.getUuid(), dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, zugehoerigkeit);
+		final PhotoMetadaten metaDaten = new PhotoMetadaten(user.getUuid(), dateTimeOriginal, longitude, latitude, 
+				breite, hoehe, TehameProperties.PHOTO_BUCKET, s3key, zugehoerigkeit);
 		LOGGER.trace(metaDaten);
 		return metaDaten;
 	}
@@ -143,23 +143,13 @@ public class MetadataBuilder {
 			LOGGER.trace(tagInfo.name + ": " + field.getValueDescription());
 		}
 	}
-	
-    public static File createJsonPhotoMetadatenFile(final PhotoMetadaten photoMetadaten) throws IOException {
-        File file = File.createTempFile("aws-java-sdk-", ".txt");
-        file.deleteOnExit();
-
-        Writer writer = new OutputStreamWriter(new FileOutputStream(file));
-        writer.write(photoMetadaten.toString());
-        writer.close();
-
-        return file;
-    }
     
     public static long toUnixTimestamp(String exifDatum) {
     	LocalDateTime date = null;
     	
     	try {
-    		date = LocalDateTime.parse(exifDatum, DATE_TIME_FORMATTER);
+    		// Entferne vorher die Hochkommata aus dem Text '2016:06:13 17:06:23'
+    		date = LocalDateTime.parse(exifDatum.replace("'", ""), DATE_TIME_FORMATTER);
     	} catch (RuntimeException e) {
     		LOGGER.error(e);
     		// TODO Was machen mit Photos ohne Datum oder Geodaten?

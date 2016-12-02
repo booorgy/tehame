@@ -59,6 +59,8 @@ public class PhotoMetadaten {
 	 * @param latitude Breitengrad.
 	 * @param breite Breite in Pixel.
 	 * @param hoehe Höhe in Pixel.
+	 * @param s3bucket S3 Bucket Name.
+	 * @param s3key S3 Key.
 	 * @param zugehoerigkeit 0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich
 	 */
 	public PhotoMetadaten(String userUuid, long aufnahmeZeitpunkt, double longitude, 
