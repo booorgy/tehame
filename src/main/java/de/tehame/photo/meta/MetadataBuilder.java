@@ -24,6 +24,8 @@ import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.jboss.logging.Logger;
 
+import de.tehame.user.User;
+
 public class MetadataBuilder {
 
 	private static final Logger LOGGER = Logger.getLogger(MetadataBuilder.class);
@@ -31,7 +33,7 @@ public class MetadataBuilder {
 	private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-	public static PhotoMetadaten getMetaData(final byte[] fileData, int zugehoerigkeit) 
+	public static PhotoMetadaten createMetaData(final byte[] fileData, int zugehoerigkeit, User user) 
 			throws ImageReadException, IOException {
 		
 		// -1 um nicht gesetzte ungültige Werte zu erkennen
@@ -126,7 +128,7 @@ public class MetadataBuilder {
 			}
 		}
 		
-		final PhotoMetadaten metaDaten = new PhotoMetadaten(dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, zugehoerigkeit);
+		final PhotoMetadaten metaDaten = new PhotoMetadaten(user.getUuid(), dateTimeOriginal, longitude, latitude, breite, hoehe, null, null, zugehoerigkeit);
 		LOGGER.trace(metaDaten);
 		return metaDaten;
 	}

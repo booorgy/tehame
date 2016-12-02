@@ -23,7 +23,7 @@ public class PhotosS3 {
 	private static final Logger LOGGER = Logger.getLogger(PhotosS3.class);
 
 	public static final String REGION = "eu-central-1";
-	public static final String BUCKET_PHOTOS = "tehame20161";
+	public static final String BUCKET_PHOTOS = "tehame";
 	public static final String BUCKET_THUMBNAILS = "tehame-thumbnails";
 
 	/**

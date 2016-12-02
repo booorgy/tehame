@@ -194,7 +194,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 			PhotoMetadaten metadaten = null;
 			
 			try {
-				metadaten = MetadataBuilder.getMetaData(fileData, zugehoerigkeit);
+				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user);
 			} catch (ImageReadException e) {
 				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);

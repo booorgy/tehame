@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.jboss.logging.Logger;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -63,8 +64,6 @@ public class MetadatenMongoDB implements Serializable {
 			final PhotoMetadaten metadaten) 
 			throws IOException {		
 		
-		DBCollection photos = loadConnectMongoCollection("picture");
-	   
 		// Erzeuge Photo Metadaten Objekt
 	    BasicDBObject photo = new BasicDBObject();
 	    photo.put("s3key", s3key);
@@ -92,6 +91,7 @@ public class MetadatenMongoDB implements Serializable {
 	    
 	    LOGGER.trace("Speichere Metadaten in MongoDB: " + photo.toJson());
 	    
+		DBCollection photos = loadConnectMongoCollection("picture");
 	    photos.insert(photo);
 	    
 	    //closeMongoConnection();
@@ -112,21 +112,32 @@ public class MetadatenMongoDB implements Serializable {
 		whereQuery.put("useruuid", user.getUuid());
 		DBCursor cursor = photos.find(whereQuery);
 		while(cursor.hasNext()) {
-			DBObject tobj = cursor.next();
-			PhotoMetadaten photoMetadaten = new PhotoMetadaten(
-					(long) tobj.get("aufnahmeZeitpunkt"), 
-					(double) tobj.get("longitude"), 
-					(double) tobj.get("latitude"), 
-					(int) tobj.get("breite"), 
-					(int) tobj.get("hoehe"),
-					(String) tobj.get("s3bucket"),
-					(String) tobj.get("s3key"),
-					(int) tobj.get("zugehoerigkeit"));	
+			PhotoMetadaten photoMetadaten = ladeMetadaten(cursor);	
 			result.add(photoMetadaten);
 		}
-		//closeMongoConnection();	  
+		//closeMongoConnection();
+		
+		LOGGER.trace("Photo Metadaten von User " + user.getUuid() + ": " + result.toString());
 		
 		return result;
+	}
+
+	private PhotoMetadaten ladeMetadaten(DBCursor cursor) {
+		DBObject metadataDoc = cursor.next();
+		DBObject geoJsonDoc = (DBObject) metadataDoc.get("loc");
+		BasicDBList coordinates = (BasicDBList) geoJsonDoc.get("coordinates");
+		
+		PhotoMetadaten photoMetadaten = new PhotoMetadaten(
+				(String) metadataDoc.get("useruuid"),
+				(long) metadataDoc.get("aufnahmeZeitpunkt"), 
+				(double) coordinates.get(0),
+				(double) coordinates.get(1),
+				(int) metadataDoc.get("breite"), 
+				(int) metadataDoc.get("hoehe"),
+				(String) metadataDoc.get("s3bucket"),
+				(String) metadataDoc.get("s3key"),
+				(int) metadataDoc.get("zugehoerigkeit"));
+		return photoMetadaten;
 	}
 	
 	/**
@@ -145,16 +156,7 @@ public class MetadatenMongoDB implements Serializable {
 		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
 		DBCursor cursor = photos.find(whereQuery);
 		while(cursor.hasNext()) {
-			DBObject tobj = cursor.next();
-			PhotoMetadaten photoMetadaten = new PhotoMetadaten(
-					(long) tobj.get("aufnahmeZeitpunkt"), 
-					(double) tobj.get("longitude"), 
-					(double) tobj.get("latitude"), 
-					(int) tobj.get("breite"), 
-					(int) tobj.get("hoehe"),
-					(String) tobj.get("s3bucket"),
-					(String) tobj.get("s3key"),
-					(int) tobj.get("zugehoerigkeit"));	
+			PhotoMetadaten photoMetadaten = ladeMetadaten(cursor);
 			result.add(photoMetadaten);
 		}
 

@@ -3,6 +3,11 @@ package de.tehame.photo.meta;
 public class PhotoMetadaten {
 	
 	/**
+	 * User UUID.
+	 */
+	private String userUuid = null;
+	
+	/**
 	 * Das Aufnahmedatum und Uhrzeit.
 	 */
 	private final long aufnahmeZeitpunkt;
@@ -48,6 +53,7 @@ public class PhotoMetadaten {
 	private final int zugehoerigkeit;
 	
 	/**
+	 * @param userUuid User UUID.
 	 * @param aufnahmeZeitpunkt UNIX Timestamp der Aufnahme.
 	 * @param longitude Längengrad.
 	 * @param latitude Breitengrad.
@@ -55,7 +61,10 @@ public class PhotoMetadaten {
 	 * @param hoehe Höhe in Pixel.
 	 * @param zugehoerigkeit 0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich
 	 */
-	public PhotoMetadaten(long aufnahmeZeitpunkt, double longitude, double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
+	public PhotoMetadaten(String userUuid, long aufnahmeZeitpunkt, double longitude, 
+			double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
+		
+		this.userUuid = userUuid;
 		this.aufnahmeZeitpunkt = aufnahmeZeitpunkt;
 		this.longitude = longitude;
 		this.latitude = latitude;
@@ -102,10 +111,19 @@ public class PhotoMetadaten {
 		this.eventUuid = eventUuid;
 	}
 
+	public int getZugehoerigkeit() {
+		return zugehoerigkeit;
+	}
+
+	public String getUserUuid() {
+		return userUuid;
+	}
+	
 	@Override
 	public String toString() {
 		return super.toString() 
 				+ " [aufnahmeZeitpunkt=" + aufnahmeZeitpunkt 
+				+ ", useruuid=" + userUuid
 				+ ", breite=" + breite
 				+ ", hoehe=" + hoehe
 				+ ", longitude=" + longitude 
@@ -115,9 +133,5 @@ public class PhotoMetadaten {
 				+ ", eventUuid=" + eventUuid
 				+ ", zugehoerigkeit=" + zugehoerigkeit 
 				+ "]";
-	}
-
-	public int getZugehoerigkeit() {
-		return zugehoerigkeit;
 	}
 }
