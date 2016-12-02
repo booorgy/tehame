@@ -4,6 +4,8 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import de.tehame.TehameProperties;
+import de.tehame.event.Event;
+import de.tehame.event.EventBean;
 import de.tehame.photo.meta.MetadatenMongoDB;
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.UserBean;
@@ -18,6 +20,9 @@ public class PhotoMB implements Serializable {
 		
 	@Inject
 	UserBean userBean;
+	
+	@Inject
+	EventBean eventBean;
 	
 	@Inject
 	private MetadatenMongoDB metadatenDB;
@@ -41,6 +46,12 @@ public class PhotoMB implements Serializable {
 		}
 		
 		return res;		
+	}
+	
+	public ArrayList<Event> getEventsFuerZugehoerigkeit(int zugehoerigkeit) {
+		ArrayList<Event> res = new ArrayList<Event>();
+		res = (ArrayList<Event>) eventBean.sucheEvents(userBean.getLoggedInUser(), zugehoerigkeit);
+		return res;
 	}
 	
 	public String test() {

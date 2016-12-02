@@ -43,6 +43,7 @@ public class EventV1RS extends SecurableEndpoint {
 	 * 
 	 * @param email Aufrufer EMail.
 	 * @param passwort Aufrufer Passwort.
+	 * @param zugehoerigkeit Aufrufer Zugehoerigkeit.
 	 * @return Alle Events, auf die der User Zugriff hat.
 	 */
 	@GET
@@ -50,11 +51,12 @@ public class EventV1RS extends SecurableEndpoint {
 	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public List<String> alleEvents(
 			@HeaderParam("email") String email,
-			@HeaderParam("passwort") String passwort) {
+			@HeaderParam("passwort") String passwort,
+			@HeaderParam("zugehoerigkeit") int zugehoerigkeit) {
 		User user = this.userBean.sucheUser(email);
 		this.auth(user, passwort, this.userBean);
 		
-		List<Event> events = this.eventBean.sucheEvents(user);
+		List<Event> events = this.eventBean.sucheEvents(user, zugehoerigkeit);
 		List<String> eventUuids = new ArrayList<>(events.size());
 		
 		for (Event e : events) {
