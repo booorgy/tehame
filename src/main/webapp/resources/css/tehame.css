@@ -1,6 +1,6 @@
-.img150
-{
-float: left;
-padding: 20px;
-font-size: 0.7em;
+
+img.thumbnail {
+	float: left;
+	padding: 20px;
+	font-size: 0.7em;
 }	

@@ -25,7 +25,8 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
 
-import de.tehame.TehameProperties;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+
 import de.tehame.event.EventBean;
 import de.tehame.photo.meta.MetadataBuilder;
 import de.tehame.photo.meta.MetadatenMongoDB;
@@ -105,7 +106,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 		LOGGER.trace("Request von User '" + email + "' zu Photo '" 
 				+ bucketName + "/" + objectKey + "'");
 		
-		return this.erstellePhotoResponse(PhotosS3.BUCKET_PHOTOS, objectKey);
+		return this.erstellePhotoResponse(bucketName, objectKey);
 	}
 
 	/**
@@ -116,22 +117,24 @@ public class PhotosV1RS extends SecurableEndpoint {
 	 * @return JAX-RS Response.
 	 */
 	private Response erstellePhotoResponse(final String bucket, final String objectKey) {
-		return Response.ok(new StreamingOutput() {
-			@Override
-			public void write(OutputStream os) throws IOException, WebApplicationException {
-				
-				byte[] photo = null;
-				try {
-					photo = PhotosV1RS.this.photosS3.ladePhoto(
-							bucket, objectKey);
-				} catch (IOException e) {
-					e.printStackTrace();
+		try {
+			final byte[] photo = PhotosV1RS.this.photosS3.ladePhoto(
+					bucket, objectKey);
+			
+			return Response.ok(new StreamingOutput() {
+				@Override
+				public void write(OutputStream os) throws IOException, WebApplicationException {
+					os.write(photo);
+					os.flush();
 				}
-				
-				os.write(photo);
-				os.flush();
-			}
-		}).build();
+			}).build();
+		} catch (IOException e) {
+			LOGGER.error("I/O Error", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		} catch (AmazonS3Exception s3e) {
+			// TODO Key aus DB entfernen
+			return Response.status(Response.Status.NOT_FOUND).entity(s3e.getMessage()).build();
+		}
 	}
 
 	/**
@@ -154,7 +157,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 	 * Speichert ein neues Photo.
 	 * 
 	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 1" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 2" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>	
+	<h:outputScript library="js" name="jquery.js" />
+	<h:outputScript library="js" name="jquery.lazy.min.js" />
+	<h:outputScript library="js" name="jquery.lazy.plugins.min.js" />
+	<h:outputScript library="js" name="tehame.js" />
+	<h:outputStylesheet library="css" name="lazy.css"  />
+	<h:outputStylesheet library="css" name="tehame.css"  />
+</h:head>
+
+<h:body>
+	<h1>Tehame</h1>
+	<h:form>
+		<ui:repeat value="#{photoMB.bilderFreunde()}" var="pic">
+			<img class="lazy thumbnail" data-src="#{pic}"/><br />
+		</ui:repeat>	
+	</h:form>
+</h:body>
+</html>

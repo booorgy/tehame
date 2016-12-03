@@ -10,6 +10,7 @@ import org.jboss.logging.Logger;
 
 import com.amazonaws.regions.RegionUtils;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -52,8 +53,9 @@ public class PhotosS3 {
 	 * @param key S3 Key.
 	 * @return Photo Daten aus S3.
 	 * @throws IOException I/O.
+	 * @throws AmazonS3Exception Wenn der Key nicht existiert.
 	 */
-	public byte[] ladePhoto(String bucket, String key) throws IOException {
+	public byte[] ladePhoto(String bucket, String key) throws IOException, AmazonS3Exception {
 		AmazonS3Client s3 = new AmazonS3Client();
 		s3.setRegion(RegionUtils.getRegion(REGION));
 		GetObjectRequest getRequest = new GetObjectRequest(bucket, key);

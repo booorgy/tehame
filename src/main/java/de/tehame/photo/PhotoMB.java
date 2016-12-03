@@ -30,6 +30,34 @@ public class PhotoMB implements Serializable {
 	private int bildHoehe = 50;
 	
 	/**
+	 * @return URIs zu Bildern von Events in der Familie.
+	 */
+	public ArrayList<String> bilderFamilie() {
+		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.FAMILIE.ordinal());
+	}
+	
+	/**
+	 * @return URIs zu privaten Bildern.
+	 */
+	public ArrayList<String> bilderPrivat() {
+		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.PRIVAT.ordinal());
+	}
+	
+	/**
+	 * @return URIs zu öffentlichen Bildern.
+	 */
+	public ArrayList<String> bilderOeffentlich() {
+		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.OEFFENTLICH.ordinal());
+	}
+	
+	/**
+	 * @return URIs zu Bildern von Events mit Freunden.
+	 */
+	public ArrayList<String> bilderFreunde() {
+		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.FREUNDE.ordinal());
+	}
+	
+	/**
 	 * Liefere Die Bilder der entsprenden Kategorie (tabIndex) als HTML-Image-Src
 	 * @return
 	 */

@@ -46,8 +46,8 @@ CREATE TABLE `relation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relationen werden bidirektional doppelt gespeichert: A -> B und B -> A';
 
 -- Admin_A und Admin_B sind Freunde
-INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'e26fc393-9219-44b5-b681-f08f054a79eb', '1');
-INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'e26fc393-9219-44b5-b681-f08f054a79ea', '1');
+INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'e26fc393-9219-44b5-b681-f08f054a79eb', '2');
+INSERT INTO `relation` (`uuidusera`, `uuiduserb`, `type`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'e26fc393-9219-44b5-b681-f08f054a79ea', '2');
 
 CREATE TABLE `event` (
   `uuid` varchar(255) NOT NULL,

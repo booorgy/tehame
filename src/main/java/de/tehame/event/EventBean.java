@@ -3,6 +3,7 @@ package de.tehame.event;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -46,6 +47,8 @@ public class EventBean {
 				uuids.add(r.getUser2().getUuid());
 		}
 		
+		// Muss absteigend sortiert sein, damit Photos korrekt zugeordnet werden,
+		// d.h. dem neusten passenden Event zugeordnet werden, falls mehrere passen würden
 		TypedQuery<Event> query = this.em.createQuery(
 				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids ORDER BY e.ends DESC", 
 				Event.class)
@@ -75,7 +78,8 @@ public class EventBean {
 		 
 		// TODO es müssen nicht alle Events abgefragt werden, es reichen die, 
 		// mit dem entsprechenden Alter wie in den Metadaten des Photos
-		for (Event event : this.sucheEvents(user, metadaten.getZugehoerigkeit())) {
+		List<Event> events = this.sucheEvents(user, metadaten.getZugehoerigkeit());
+		for (Event event : events) {
 			
 			// Folgendes muss mit in das Query
 			// Sind die Metadaten zu alt oder neu für das Event?
@@ -107,11 +111,16 @@ public class EventBean {
 				
 				LOGGER.trace("Das Photo " + metadaten.getS3key() + " wurde dem Event " + event.getUuid() + " zugeordnet");
 				
-				this.em.merge(event);
-				
 				// Falls noch nicht vorhanden, ordne das Event dem User zu
-				if (!event.getUsers().contains(user)) {
+				Predicate<User> userUuidVorhanden = u -> u.getUuid().equals(user.getUuid());
+				
+				// contains() kann man hier nicht verwenden, weil es auf equals() basiert
+				if (!event.getUsers().stream().anyMatch(userUuidVorhanden)) {
+					// Merge nur den User, das Event hängt dran
 					this.verknuepfeUserUndEvent(user, event);
+				} else {
+					// Merge nur das Event, der User hängt schon dran
+					this.em.merge(event);
 				}
 				
 				return metadaten;
