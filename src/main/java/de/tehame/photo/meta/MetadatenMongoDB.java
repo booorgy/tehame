@@ -78,7 +78,8 @@ public class MetadatenMongoDB implements Serializable {
 	    photo.put("useruuid", metadaten.getUserUuid());	
 	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
 	    photo.put("breite", metadaten.getBreite());	
-	    photo.put("hoehe", metadaten.getHoehe());	
+	    photo.put("hoehe", metadaten.getHoehe());
+	    photo.put("eventuuid", metadaten.getEventUuid());
 	    
 	    LOGGER.trace("Speichere Metadaten in MongoDB: " + photo.toJson());
 	    
@@ -128,7 +129,35 @@ public class MetadatenMongoDB implements Serializable {
 				(String) metadataDoc.get("s3bucket"),
 				(String) metadataDoc.get("s3key"),
 				(int) metadataDoc.get("zugehoerigkeit"));
+		
+		photoMetadaten.setEventUuid((String) metadataDoc.get("eventuuid"));
+		
 		return photoMetadaten;
+	}
+	
+	/**
+	 * @return Alle Bilder des Users mit der entsprechenden Zugehörigkeit und Event UUID.
+	 */
+	public ArrayList<PhotoMetadaten> getPhotosByUserAndZugehoerigkeit(User user, int zugehoerigkeit, String eventUuid) {
+		ArrayList<PhotoMetadaten> result = new ArrayList<PhotoMetadaten>();
+		
+		DBCollection photos = loadConnectMongoCollection("picture");
+		
+		BasicDBObject whereQuery = new BasicDBObject();
+		
+		whereQuery.put("useruuid", user.getUuid());
+		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
+		whereQuery.put("eventuuid", eventUuid);
+		
+		DBCursor cursor = photos.find(whereQuery);
+		while(cursor.hasNext()) {
+			PhotoMetadaten photoMetadaten = ladeMetadaten(cursor);
+			result.add(photoMetadaten);
+		}
+
+		//closeMongoConnection();	  
+		
+		return result;
 	}
 	
 	/**

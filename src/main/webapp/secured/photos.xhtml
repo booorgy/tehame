@@ -18,8 +18,16 @@
 <h:body>
 	<h1>Tehame</h1>
 	<h:form>
-		<ui:repeat value="#{photoMB.bilderFreunde()}" var="pic">
-			<img class="lazy thumbnail" data-src="#{pic}"/><br />
+		<p:panelGrid columns="4" style="clear: both;">
+			<p:commandLink actionListener="#{photoMB.selektiereBilder(0)}" immediate="true" value="Privat" ajax="true" update="@form" partialSubmit="true" oncomplete="lazyThumbnails();" />
+			<p:commandLink actionListener="#{photoMB.selektiereBilder(1)}" immediate="true" value="Familie" ajax="true" update="@form" partialSubmit="true" oncomplete="lazyThumbnails();"/>
+			<p:commandLink actionListener="#{photoMB.selektiereBilder(2)}" immediate="true" value="Freunde" ajax="true" update="@form" partialSubmit="true" oncomplete="lazyThumbnails();" />
+			<p:commandLink actionListener="#{photoMB.selektiereBilder(3)}" immediate="true" value="Öffentlich" ajax="true" update="@form" partialSubmit="true" oncomplete="lazyThumbnails();" />
+		</p:panelGrid>
+		<ui:repeat value="#{photoMB.photoURIs}" var="photoURI">
+			<div class="thumbnail">
+				<img class="lazy" data-src="#{photoURI}"/>
+			</div>
 		</ui:repeat>	
 	</h:form>
 </h:body>

@@ -1,6 +1,5 @@
 
-img.thumbnail {
-	float: left;
-	padding: 20px;
-	font-size: 0.7em;
-}	
+div.thumbnail {
+    float: left;
+    margin: 3px;
+}

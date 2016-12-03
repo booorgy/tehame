@@ -29,34 +29,12 @@ public class PhotoMB implements Serializable {
 	
 	private int bildHoehe = 50;
 	
-	/**
-	 * @return URIs zu Bildern von Events in der Familie.
-	 */
-	public ArrayList<String> bilderFamilie() {
-		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.FAMILIE.ordinal());
-	}
+	private ArrayList<String> photoURIs = null;
 	
-	/**
-	 * @return URIs zu privaten Bildern.
-	 */
-	public ArrayList<String> bilderPrivat() {
-		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.PRIVAT.ordinal());
+	public void selektiereBilder(int selectedZugehoerigkeit) {
+		this.photoURIs = this.getBilderFuerZugehoerigkeit(selectedZugehoerigkeit);
 	}
-	
-	/**
-	 * @return URIs zu öffentlichen Bildern.
-	 */
-	public ArrayList<String> bilderOeffentlich() {
-		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.OEFFENTLICH.ordinal());
-	}
-	
-	/**
-	 * @return URIs zu Bildern von Events mit Freunden.
-	 */
-	public ArrayList<String> bilderFreunde() {
-		return this.getBilderFuerZugehoerigkeit(Zugehoerigkeit.FREUNDE.ordinal());
-	}
-	
+
 	/**
 	 * Liefere Die Bilder der entsprenden Kategorie (tabIndex) als HTML-Image-Src
 	 * @return
@@ -68,9 +46,9 @@ public class PhotoMB implements Serializable {
 		metadatens = metadatenDB.getPhotosByUserAndZugehoerigkeit(userBean.getLoggedInUser(), zugehoerigkeit);
 		
 		for(PhotoMetadaten metadaten : metadatens) {
-			res.add(new String(TehameProperties.IMAGE_CALLBACK_URL_JSF 
+			res.add(new String(TehameProperties.IMAGE_CALLBACK_URL_JSF // FIXME localhost nix gut
 					+ TehameProperties.THUMBNAIL_BUCKET + "/"
-					+ metadaten.getS3key() + "/"));
+					+ metadaten.getS3key()));
 		}
 		
 		return res;		
@@ -98,5 +76,7 @@ public class PhotoMB implements Serializable {
 		this.bildHoehe = bildHoehe;
 	}
 
-	
+	public ArrayList<String> getPhotoURIs() {
+		return photoURIs;
+	}
 }
