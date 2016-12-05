@@ -56,7 +56,7 @@ public class EventV1RS extends SecurableEndpoint {
 		User user = this.userBean.sucheUser(email);
 		this.auth(user, passwort, this.userBean);
 		
-		List<Event> events = this.eventBean.sucheEvents(user, zugehoerigkeit);
+		List<Event> events = this.eventBean.sucheEvents(userBean.sucheRelationenMitZugehoerigkeit(user, zugehoerigkeit));
 		List<String> eventUuids = new ArrayList<>(events.size());
 		
 		for (Event e : events) {

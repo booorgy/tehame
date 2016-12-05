@@ -56,7 +56,7 @@ public class PhotoMB implements Serializable {
 	
 	public ArrayList<Event> getEventsFuerZugehoerigkeit(int zugehoerigkeit) {
 		ArrayList<Event> res = new ArrayList<Event>();
-		res = (ArrayList<Event>) eventBean.sucheEvents(userBean.getLoggedInUser(), zugehoerigkeit);
+		res = (ArrayList<Event>) eventBean.sucheEvents(userBean.sucheRelationenMitZugehoerigkeit(userBean.getLoggedInUser(), zugehoerigkeit));
 		return res;
 	}
 	

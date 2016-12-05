@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -16,6 +17,7 @@ import org.jboss.logging.Logger;
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.Relation;
 import de.tehame.user.User;
+import de.tehame.user.UserBean;
 
 @Stateless
 @LocalBean
@@ -23,6 +25,9 @@ public class EventBean {
 	
 	@PersistenceContext(unitName = "tehamePU")
 	private EntityManager em;
+	
+	@Inject
+	UserBean userBean;
 	
 	private static final Logger LOGGER = Logger.getLogger(EventBean.class);
 	
@@ -34,18 +39,7 @@ public class EventBean {
 	 * @param user User.
 	 * @return Alle Events eines Users und dessen Relationen (1st Level).
 	 */
-	public List<Event> sucheEvents(User user, int zugehoerigkeit) { // TODO test
-		User u = this.em.find(User.class, user.getUuid());
-		List<Relation> relations = u.getRelations1();
-		
-		List<String> uuids = new LinkedList<String>();
-		uuids.add(user.getUuid());
-		
-		// FIXME Ugly N+1 Problem
-		for (Relation r : relations) {
-			if (r.getId().getType() == zugehoerigkeit)
-				uuids.add(r.getUser2().getUuid());
-		}
+	public List<Event> sucheEvents(List<String> uuids) { // TODO test
 		
 		// Muss absteigend sortiert sein, damit Photos korrekt zugeordnet werden,
 		// d.h. dem neusten passenden Event zugeordnet werden, falls mehrere passen würden
@@ -78,7 +72,7 @@ public class EventBean {
 		 
 		// TODO es müssen nicht alle Events abgefragt werden, es reichen die, 
 		// mit dem entsprechenden Alter wie in den Metadaten des Photos
-		List<Event> events = this.sucheEvents(user, metadaten.getZugehoerigkeit());
+		List<Event> events = this.sucheEvents(userBean.sucheRelationenMitZugehoerigkeit(user, metadaten.getZugehoerigkeit()));
 		for (Event event : events) {
 			
 			// Folgendes muss mit in das Query

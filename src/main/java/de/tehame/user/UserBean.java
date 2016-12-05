@@ -52,7 +52,7 @@ public class UserBean {
 		// Es wurde bereits ein User mit der EMail gefunden.
 		return false;
 	}
-	
+		
 	/**
 	 * Sucht einen User anhand seiner EMail Adresse.
 	 * @param email EMail.
@@ -118,6 +118,27 @@ public class UserBean {
 			uuids.add(r.getId().getUuiduserb());
 		}
 		
+		return uuids;
+	}
+	
+	/**
+	 * Sucht für einen User liste mit uuids der Beziehungen.
+	 * @param user Der User
+	 * @param zugehoerigkeit die enstprechende Zugehörigkeit
+	 * @return liste mit uuids
+	 */
+	public List<String> sucheRelationenMitZugehoerigkeit(User user, int zugehoerigkeit) {
+		User u = this.em.find(User.class, user.getUuid());
+		List<Relation> relations = u.getRelations1();
+		
+		List<String> uuids = new LinkedList<String>();
+		uuids.add(user.getUuid());
+		
+		// FIXME Ugly N+1 Problem
+		for (Relation r : relations) {
+			if (r.getId().getType() == zugehoerigkeit)
+				uuids.add(r.getUser2().getUuid());
+		}
 		return uuids;
 	}
 }
