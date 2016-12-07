@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
 
@@ -36,7 +38,14 @@ public class PhotosS3 {
 		s3.setRegion(RegionUtils.getRegion(TehameProperties.REGION));
 		String bucketName = TehameProperties.PHOTO_BUCKET;
 		String key = UUID.randomUUID().toString();
-		ObjectMetadata metadata = new ObjectMetadata(); // TODO ?
+		ObjectMetadata metadata = new ObjectMetadata();
+		
+		byte[] resultByte = DigestUtils.md5(fileData);
+		String streamMD5 = new String(Base64.encodeBase64(resultByte));
+		metadata.setContentMD5(streamMD5);
+		
+		metadata.setContentLength((long) fileData.length);
+		
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
 		PutObjectRequest putRequest = new PutObjectRequest(bucketName, key, inputStream, metadata);
 		s3.putObject(putRequest);
