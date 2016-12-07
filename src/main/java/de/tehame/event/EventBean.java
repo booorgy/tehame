@@ -15,7 +15,6 @@ import javax.persistence.TypedQuery;
 import org.jboss.logging.Logger;
 
 import de.tehame.photo.meta.PhotoMetadaten;
-import de.tehame.user.Relation;
 import de.tehame.user.User;
 import de.tehame.user.UserBean;
 
@@ -82,7 +81,7 @@ public class EventBean {
 				continue;
 			}
 			
-			// TODO vielleicht geht das mit mongodb direkt?
+			// Distanz in Meter
 			final double distance = event.berechneDistanzZumMittelpunkt(metadaten);
 			
 			// Liegt der Ort im Umkreis des Events?

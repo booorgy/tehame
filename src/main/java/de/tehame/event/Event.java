@@ -37,15 +37,15 @@ public class Event implements Serializable {
 	 * in dem ein anderes Photo gemacht sein muss, um zu dem gleichen Event zu
 	 * gehören.
 	 */
-	public static final double RADIUS_INITIAL_WINKEL = 100d; // TODO 100 ist natürlich viel zu viel, hier geht es um das Winkelmaß
+	public static final double RADIUS_INITIAL_METER = 100d;
 	
 	/**
 	 * Wenn das Photo nahe am Rand innerhalb eines Event-Umkreises gemacht wird,
-	 * dann wird der Radius um diesen Winkel hier erweitert,
+	 * dann wird der Radius um diese Meter hier erweitert,
 	 * wenn der Umkreis um das Bild mit diesem Radius hier aus dem Umkreis des
 	 * Events herausragt. Der Umkreis des Events muss dann wachsen.
 	 */
-	public static final double RADIUS_ERWEITERUNG_WINKEL = 10d; // TODO 10 ist natürlich viel zu viel, hier geht es um das Winkelmaß
+	public static final double RADIUS_ERWEITERUNG_METER = 10d;
 
 	/**
 	 * UUID des Events.
@@ -89,7 +89,7 @@ public class Event implements Serializable {
 	private int anzahlPhotos = 0;
 	
 	/**
-	 * Radius des Events um den Mittelpunkt. Sollte etwas größer sein,
+	 * Radius des Events um den Mittelpunkt in Metern. Sollte etwas größer sein,
 	 * als die maximale Distanz zwischen dem Mittelpunkt und aller Punkte in der Wolke.
 	 */
 	private double radius = 0L;
@@ -125,7 +125,7 @@ public class Event implements Serializable {
 		this.latitudeSum = metadaten.getLatitude();
 		this.longitudeSum = metadaten.getLongitude();
 		this.anzahlPhotos = 1;
-		this.radius = RADIUS_INITIAL_WINKEL;
+		this.radius = RADIUS_INITIAL_METER;
 		this.ends = metadaten.getAufnahmeZeitpunkt() + DIFFERENZ_SEKUNDEN;
 		this.begins = metadaten.getAufnahmeZeitpunkt() - DIFFERENZ_SEKUNDEN;
 	}
@@ -140,13 +140,50 @@ public class Event implements Serializable {
 	
 	/**
 	 * @param metadaten Metadaten.
-	 * @return Die Distanz zwischen dem Event Mittelpunkt und der Photo Geolocation.
+	 * @return Die Distanz zwischen dem Event Mittelpunkt und der Photo Geolocation in Metern.
 	 */
 	protected double berechneDistanzZumMittelpunkt(PhotoMetadaten metadaten) {
-		final double diffLat = metadaten.getLatitude() - this.getLatitudeCenter();
-		final double diffLon = metadaten.getLongitude() - this.getLongitudeCenter();
-		final double distanceX = Math.sqrt(diffLat * diffLat + diffLon * diffLon);
-		return distanceX;
+		final double distanz = this.haversine(
+				/* Koordinate 1 */ metadaten.getLatitude(), metadaten.getLongitude(), 
+				/* Koordinate 2 */ this.getLatitudeCenter(), this.getLongitudeCenter());
+		return distanz;
+	}
+	
+	/**
+	 * Quelle: http://stackoverflow.com/questions/18861728/calculating-distance-between-two-points-represented-by-lat-long-upto-15-feet-acc
+	 * 
+	 * Weitere Infos zum Thema:
+	 * Google verwendet vermutlich WGS84 als Koordinaten Referenz System (wie GPS):
+	 * http://stackoverflow.com/questions/1676940/google-maps-spatial-reference-system
+	 * 
+	 * "WGS 84 is the reference coordinate system used by the Global Positioning System"
+	 * (Quelle: https://en.wikipedia.org/wiki/World_Geodetic_System)
+	 * 
+	 * http://api.mongodb.com/java/3.2/com/mongodb/client/model/geojson/NamedCoordinateReferenceSystem.html
+	 * 
+	 * http://gis.stackexchange.com/questions/54073/what-is-crs84-projection
+	 * "CRS:84 is equivalent to EPSG:4326 - ie, basic WGS84 degrees"
+	 * 
+	 * http://mapserver.org/ogc/wms_server.html#coordinate-systems-and-axis-orientation
+	 * "CRS:84 (WGS 84 longitude-latitude)"
+	 * 
+	 * @param lat1 Latitude 1 in Grad.
+	 * @param lng1 Longitude 1 in Grad.
+	 * @param lat2 Latitude 2 in Grad.
+	 * @param lng2 Longitude 2 in Grad.
+	 * 
+	 * @return Distanz in Metern.
+	 */
+	protected double haversine(double lat1, double lng1, double lat2, double lng2) {
+	    int r = 6371 * 1000; // Durchschnittlicher Radius der Erde in Metern
+	    double dLat = Math.toRadians(lat2 - lat1);
+	    double dLon = Math.toRadians(lng2 - lng1);
+	    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+	       Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) 
+	      * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	    double d = r * c;
+	    return d;
 	}
 
 	/**
@@ -158,8 +195,8 @@ public class Event implements Serializable {
 	 * @param distance Distanz des Photos zum Mittelpunkt.
 	 */
 	protected void erweitereUmkreis(final double distance) {
-		if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > this.getRadius()) {
-			this.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
+		if (distance + Event.RADIUS_ERWEITERUNG_METER > this.getRadius()) {
+			this.setRadius(distance + Event.RADIUS_ERWEITERUNG_METER);
 		}
 	}
 

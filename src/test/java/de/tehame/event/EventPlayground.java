@@ -53,8 +53,8 @@ public class EventPlayground {
 				// Photos die am Rand des Umkreises gemacht werden, 
 				// sollen diesen vergrößern
 				// Achtung: Hier wird getan, als seien es Meter
-				if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > event.getRadius()) {
-					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
+				if (distance + Event.RADIUS_ERWEITERUNG_METER > event.getRadius()) {
+					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_METER);
 				}
 				
 				// Erweitere den zeitlichen Rahmen bei Bedarf
@@ -105,8 +105,8 @@ public class EventPlayground {
 				// Photos die am Rand des Umkreises gemacht werden, 
 				// sollen diesen vergrößern
 				// Achtung: Hier wird getan, als seien es Meter
-				if (distance + Event.RADIUS_ERWEITERUNG_WINKEL > event.getRadius()) {
-					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_WINKEL);
+				if (distance + Event.RADIUS_ERWEITERUNG_METER > event.getRadius()) {
+					event.setRadius(distance + Event.RADIUS_ERWEITERUNG_METER);
 					this.speichereEvent(event);
 				}
 				
