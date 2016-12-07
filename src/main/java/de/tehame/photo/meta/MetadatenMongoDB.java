@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.jboss.logging.Logger;
 
@@ -17,6 +18,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import de.tehame.TehameProperties;
+import de.tehame.event.Event;
 import de.tehame.user.User;
 
 /**
@@ -136,18 +138,18 @@ public class MetadatenMongoDB implements Serializable {
 	}
 	
 	/**
-	 * @return Alle Bilder des Users mit der entsprechenden Zugehörigkeit und Event UUID.
+	 * @return Alle Bilder der User mit der entsprechenden Zugehörigkeit und den Events.
 	 */
-	public ArrayList<PhotoMetadaten> getPhotosByUserAndZugehoerigkeit(User user, int zugehoerigkeit, String eventUuid) {
+	public ArrayList<PhotoMetadaten> getPhotosByUserAndZugehoerigkeit(List<String> userUuids, int zugehoerigkeit, String[] eventUuids) {
 		ArrayList<PhotoMetadaten> result = new ArrayList<PhotoMetadaten>();
 		
 		DBCollection photos = loadConnectMongoCollection("picture");
 		
 		BasicDBObject whereQuery = new BasicDBObject();
 		
-		whereQuery.put("useruuid", user.getUuid());
 		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
-		whereQuery.put("eventuuid", eventUuid);
+		whereQuery.put("useruuid", new BasicDBObject("$in", userUuids));
+		whereQuery.put("eventuuid", new BasicDBObject("$in", eventUuids));
 		
 		DBCursor cursor = photos.find(whereQuery);
 		while(cursor.hasNext()) {
@@ -175,6 +177,29 @@ public class MetadatenMongoDB implements Serializable {
 		whereQuery.put("useruuid", user.getUuid());
 		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
 		DBCursor cursor = photos.find(whereQuery);
+		while(cursor.hasNext()) {
+			PhotoMetadaten photoMetadaten = ladeMetadaten(cursor);
+			result.add(photoMetadaten);
+		}
+
+		//closeMongoConnection();	  
+		
+		return result;
+	}
+
+	public ArrayList<PhotoMetadaten> getPhotosByUserAndZugehoerigkeit(User user, int zugehoerigkeit, List<String> events) {
+		ArrayList<PhotoMetadaten> result = new ArrayList<PhotoMetadaten>();
+		
+		DBCollection photos = loadConnectMongoCollection("picture");
+		
+		BasicDBObject whereQuery = new BasicDBObject();
+		
+		whereQuery.put("eventuuid", events);
+		whereQuery.put("useruuid", user.getUuid());
+		whereQuery.put("zugehoerigkeit", zugehoerigkeit);
+		
+		DBCursor cursor = photos.find(whereQuery);
+		
 		while(cursor.hasNext()) {
 			PhotoMetadaten photoMetadaten = ladeMetadaten(cursor);
 			result.add(photoMetadaten);
