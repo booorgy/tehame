@@ -1,12 +1,14 @@
 package de.tehame.event;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.User;
@@ -93,6 +95,12 @@ public class Event implements Serializable {
 	 * als die maximale Distanz zwischen dem Mittelpunkt und aller Punkte in der Wolke.
 	 */
 	private double radius = 0L;
+	
+	/**
+	 * Liste mit den Urls zu den Bildern des Events.
+	 */
+	@Transient
+	private ArrayList<String> photoUrls = new ArrayList<String>();
 	
 	/**
 	 * Bidirektional N:N, die User zu diesem Event.
@@ -372,4 +380,14 @@ public class Event implements Serializable {
 			return false;
 		return true;
 	}
+
+	public ArrayList<String> getPhotoUrls() {
+		return photoUrls;
+	}
+
+	public void setPhotoUrls(ArrayList<String> photoUrls) {
+		this.photoUrls = photoUrls;
+	}
+	
+	
 }

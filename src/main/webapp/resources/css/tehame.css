@@ -3,3 +3,8 @@ div.thumbnail {
     float: left;
     margin: 3px;
 }
+
+div.eventContainer {
+	background-color: lightblue;
+	border:2px solid black;
+}

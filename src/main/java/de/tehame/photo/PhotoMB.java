@@ -1,8 +1,11 @@
 package de.tehame.photo;
 
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
 import de.tehame.TehameProperties;
 import de.tehame.event.Event;
 import de.tehame.event.EventBean;
@@ -11,6 +14,7 @@ import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.UserBean;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 @Named
 @SessionScoped
@@ -53,11 +57,46 @@ public class PhotoMB implements Serializable {
 		
 		return res;		
 	}
-	
-	public ArrayList<Event> getEventsFuerZugehoerigkeit(int zugehoerigkeit) {
+		
+/*	public ArrayList<Event> getEventsFuerZugehoerigkeit(int zugehoerigkeit) {
 		ArrayList<Event> res = new ArrayList<Event>();
 		res = (ArrayList<Event>) eventBean.sucheEvents(userBean.sucheRelationenMitZugehoerigkeit(userBean.getLoggedInUser(), zugehoerigkeit));
 		return res;
+	}*/
+	
+	/**
+	 * Liefere Die Bilder der entsprenden Kategorie (tabIndex) als HTML-Image-Src
+	 * @return
+	 */
+	public ArrayList<Event> getEventsFuerZugehoerigkeit(int zugehoerigkeit) {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		String url = request.getRequestURL().toString();
+		// Beispiel URL: http://localhost:8080/tehame/secured/photos.xhtml
+		// Beispiel URI:                      /tehame/secured/photos.xhtml
+		// Base URL:     http://localhost:8080
+		String baseURL = url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+		
+		
+		
+		ArrayList<PhotoMetadaten> metadatens = new ArrayList<PhotoMetadaten>();
+		
+		List<String> users = userBean.sucheRelationenMitZugehoerigkeit(userBean.getLoggedInUser(), zugehoerigkeit);
+		ArrayList<Event> events = (ArrayList<Event>) eventBean.sucheEvents(users);
+		
+		for (Event event : events) {
+			ArrayList<String> photos = new ArrayList<String>();
+			metadatens = metadatenDB.getPhotosByUserAndZugehoerigkeit(
+					users, 
+					zugehoerigkeit, 
+					events.stream().map(e -> event.getUuid()).toArray(String[]::new));
+		
+			for (PhotoMetadaten metadaten : metadatens) {
+				photos.add(baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key());
+			}
+			event.setPhotoUrls(photos);
+		}
+		
+		return events;		
 	}
 	
 	public String test() {
