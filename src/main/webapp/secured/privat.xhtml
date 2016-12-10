@@ -49,11 +49,26 @@
 		</table>		
 	</h:form>
 	<h:form>
-		<div class="img150">
-			<ui:repeat value="#{photoMB.getBilderFuerZugehoerigkeit(0)}" var="pic">
-				<img class="lazy" data-src="#{pic}"/>
-			</ui:repeat>		
-		</div>	
+	<h:form>
+			<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(0)}" var="event">
+				<div class="eventContainer">
+					Start : 
+					<h:outputText value="#{event.begins}" >
+						<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" timeZone="CET"/>
+					</h:outputText>					
+					Ende : 		
+					<h:outputText value="#{event.ends}" >
+						<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" timeZone="CET"/>
+					</h:outputText>	
+					<br/>	
+					<hr />	
+						<ui:repeat value="#{event.photoUrls}" var="url">
+							<img class="lazy" data-src="#{url}"/>
+						</ui:repeat>									
+				</div>
+				<br/>	
+			</ui:repeat>						
+	</h:form>
 	
 	</h:form>
 </h:body>
