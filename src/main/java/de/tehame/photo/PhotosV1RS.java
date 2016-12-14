@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.annotation.MultipartConfig;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -17,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
@@ -24,6 +29,9 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 
@@ -157,7 +165,8 @@ public class PhotosV1RS extends SecurableEndpoint {
 	 * Speichert ein neues Photo.
 	 * 
 	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 2" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * (veraltet) curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 2" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
+	 * TODO Multipart Curl
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.
@@ -167,13 +176,13 @@ public class PhotosV1RS extends SecurableEndpoint {
 	@POST
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
-	@Consumes("image/jpeg")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String addPhoto(
-			final InputStream is, 
+			MultipartFormDataInput input, 
 			@HeaderParam("zugehoerigkeit") int zugehoerigkeit, 
 			@HeaderParam("email") String email, 
 			@HeaderParam("passwort") String passwort) {
-		
+			
 		LOGGER.trace("Versuche Photo hochzuladen. HeaderParams: email: " 
 				+ email + ", passwort: " + passwort);
 		
@@ -181,6 +190,40 @@ public class PhotosV1RS extends SecurableEndpoint {
 		this.auth(user, passwort, this.userBean);
 		
 		// TODO prüfen, dass upload ein bild ist und nicht ausführbar etc. (MetaDaten Angriffe)
+		// TODO mehrere Fotos gleichzeitig versenden
+		
+		// Der folgende Abschnitt ist nur für das Debugging des Multiparts
+		Map<String, List<InputPart>> formParts = input.getFormDataMap();
+		
+		for (String key : formParts.keySet()) {
+			LOGGER.trace("FormPart '" + key + "':");
+			List<InputPart> inputParts = formParts.get(key);
+			
+			for (InputPart p : inputParts) {
+				LOGGER.trace(p.getHeaders().toString());
+			}
+		}
+		
+		// Ab hier wird nur der Part "photo" verarbeitet
+		List<InputPart> inputParts = formParts.get("photo");
+		
+		InputStream is = null;
+		
+		for (InputPart part : inputParts) {
+			try {
+				 MultivaluedMap<String, String> headers = part.getHeaders();
+				 
+				 for (String key : headers.keySet()) {
+					 LOGGER.trace(key + "=" + headers.get(key));
+				 }
+				 
+				 is = part.getBody(InputStream.class, null);
+				 break;
+				 
+			} catch (Exception e) {
+				LOGGER.error(e);
+			}
+		}
 		
 		final byte[] fileData = this.leseStream(is);
 		
