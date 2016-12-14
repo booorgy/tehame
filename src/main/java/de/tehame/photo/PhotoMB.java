@@ -93,10 +93,17 @@ public class PhotoMB implements Serializable {
 			for (PhotoMetadaten metadaten : metadatens) {
 				photos.add(baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key());
 			}
-			event.setPhotoUrls(photos);
+				event.setPhotoUrls(photos);					
 		}
 		
-		return events;		
+		// Nur die Events zurückgeben, welche auch Bilder haben bzw. die Zugehörigkeit passt.
+		ArrayList<Event> eventsMitBildern = new ArrayList<Event>();
+		for (Event event : events) {
+			if (event.getPhotoUrls().size() > 0)
+				eventsMitBildern.add(event);
+		}
+		
+		return eventsMitBildern;		
 	}
 	
 	public String test() {
