@@ -164,9 +164,10 @@ public class PhotosV1RS extends SecurableEndpoint {
 	/**
 	 * Speichert ein neues Photo.
 	 * 
-	 * Beispiel (Das '--data-binary @' definiert einen Pfad zur Datei): 
-	 * (veraltet) curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: image/jpeg" -H "zugehoerigkeit: 2" -H "email: admin_a@tehame.de" -H "passwort: a" --data-binary @"../../photos/trump.jpg"
-	 * TODO Multipart Curl
+	 * Multipart Beispiel: 
+	 * curl http://localhost:8080/tehame/rest/v1/photos -v -H "Content-Type: multipart/form-data" -H "zugehoerigkeit: 2" -H "email: admin_a@tehame.de" -H "passwort: a" -F "photo=@d:\trump.jpg;type=image/jpeg"
+	 * 
+	 * Das '@' definiert einen Pfad zur Datei, hinter dem Semikolon muss der Typ des Parts stehen.
 	 * 
 	 * @param is Der Input Stream wird durch JAX-RS injected.
 	 * @param email EMail Header.
