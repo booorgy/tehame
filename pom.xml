@@ -205,6 +205,11 @@
 		    <version>1.11.59</version>
 		</dependency>
 		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-ses</artifactId>
+		    <version>1.11.66</version>
+		</dependency>
+		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver</artifactId>
 			<version>3.3.0</version>
