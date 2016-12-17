@@ -6,6 +6,8 @@ CREATE TABLE `user` (
   `uuid` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `passwort` varchar(255) NOT NULL,
+  `verifiziert` bit(1) NOT NULL,
+  `verifizierungsschluessel` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -28,8 +30,10 @@ CREATE TABLE `userrole` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Passwort: a
-INSERT INTO `user` (`uuid`, `email`, `passwort`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'admin_a@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=');
-INSERT INTO `user` (`uuid`, `email`, `passwort`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'admin_b@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=');
+INSERT INTO `user` (`uuid`, `email`, `passwort`, `verifiziert`, `verifizierungsschluessel`) 
+            VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'admin_a@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 0, NULL);
+INSERT INTO `user` (`uuid`, `email`, `passwort`, `verifiziert`, `verifizierungsschluessel`) 
+            VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'admin_b@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 0, NULL);
 INSERT INTO `role` (`id`, `name`) VALUES ('1', 'admin');
 INSERT INTO `role` (`id`, `name`) VALUES ('2', 'user');
 INSERT INTO `userrole` (`uuiduser`, `idrole`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', '1');

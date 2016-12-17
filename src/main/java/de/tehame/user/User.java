@@ -37,6 +37,16 @@ public class User implements Serializable {
 	private String email;
 	
 	/**
+	 * Ob die Registriernugs-Mail bestätigt wurde.
+	 */
+	private boolean verifiziert;
+	
+	/**
+	 * Beinhaltet den Schlüssel, der bei der Registrierung an den User versandt wurde.
+	 */
+	private String verifizierungsschluessel;
+	
+	/**
 	 * SHA-256 Base64 Hash.
 	 * Der JSON Mapper soll den Hash niemals mit in das JSON übernehmen.
 	 */
@@ -183,5 +193,21 @@ public class User implements Serializable {
 		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
+	}
+
+	public boolean isVerifiziert() {
+		return verifiziert;
+	}
+
+	public void setVerifiziert(boolean verifiziert) {
+		this.verifiziert = verifiziert;
+	}
+
+	public String getVerifizierungsschluessel() {
+		return verifizierungsschluessel;
+	}
+
+	public void setVerifizierungsschluessel(String verifizierungsschluessel) {
+		this.verifizierungsschluessel = verifizierungsschluessel;
 	}
 }

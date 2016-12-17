@@ -3,6 +3,7 @@ package de.tehame.user;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.ejb.LocalBean;
@@ -16,8 +17,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.jboss.crypto.CryptoUtil;
-
-import de.tehame.event.Event;
 
 @Stateless
 @LocalBean
@@ -35,6 +34,8 @@ public class UserBean {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean registrieren(User user) {
+		
+		user.setVerifizierungsschluessel(UUID.randomUUID().toString());
 		
 		TypedQuery<User> q = this.em.createQuery(
 				"SELECT u FROM user AS u WHERE u.email = :email", 
@@ -140,5 +141,30 @@ public class UserBean {
 				uuids.add(r.getUser2().getUuid());
 		}
 		return uuids;
+	}
+
+	/**
+	 * @param userUuid User UUID.
+	 * @return User Entity.
+	 */
+	public User sucheUserAnhandUuid(String userUuid) {
+		TypedQuery<User> q = this.em.createQuery(
+				"SELECT u FROM user AS u WHERE u.uuid = :uuid", 
+				User.class)
+				.setParameter("uuid", userUuid);
+		
+		try {
+			return q.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Aktualisiert die Entity.
+	 * @param user User Entity.
+	 */
+	public void merge(User user) {
+		this.em.merge(user);
 	}
 }
