@@ -95,18 +95,19 @@ public class UserV1RS extends SecurableEndpoint {
 		
 		if (user != null) {
 			
-			if (user.getVerifizierungsschluessel().equals(secret)) {
+			if (user.getVerifizierungsschluessel() == null) {
+				return "<html><body><h1>EMail Adresse ist bereits verifiziert</h1></body></html>";
 				
+			} else if (user.getVerifizierungsschluessel().equals(secret)) {
 				user.setVerifiziert(true);
 				user.setVerifizierungsschluessel(null);
 				this.userBean.merge(user);
-				
 				return "<html><body><h1>Ihre Registrierung ist nun abgeschlossen</h1></body></html>";
 			} else {
 				return "<html><body><h1>Dieser Link ist abgelaufen</h1></body></html>"; // TODO Neue EMail anfordern
 			}
 		} else {
-			return "<html><body><h1>Ungültiger Link</h1></body></html>";
+			return "<html><body><h1>Ungueltiger Link</h1></body></html>";
 		}
 	}
 	
@@ -146,7 +147,7 @@ public class UserV1RS extends SecurableEndpoint {
         Content textBody = new Content().withData(
         		"Um Ihre Registrierung bei Tehame abzuschließen, klicken Sie bitte den folgenden"
         		+ " Link oder kopieren diesen in Ihre Browser-Adresszeile und öffnen Ihn dort."
-        		+ " http://localhost:8080/tehame/rest/v1/user/" + user.getUuid() 
+        		+ " " + TehameProperties.EB_URL + "/tehame/rest/v1/user/" + user.getUuid() 
         		+ "/verify/" + user.getVerifizierungsschluessel()); // FIXME RPC Style
         Body body = new Body().withText(textBody);
         Message message = new Message().withSubject(subject).withBody(body);
