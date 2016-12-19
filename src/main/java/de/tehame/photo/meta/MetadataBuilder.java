@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.apache.commons.imaging.ImageReadException;
@@ -150,7 +151,7 @@ public class MetadataBuilder {
     	try {
     		// Entferne vorher die Hochkommata aus dem Text '2016:06:13 17:06:23'
     		date = LocalDateTime.parse(exifDatum.replace("'", ""), DATE_TIME_FORMATTER);
-    	} catch (RuntimeException e) {
+    	} catch (DateTimeParseException e) {
     		LOGGER.error(e);
     		// TODO Was machen mit Photos ohne Datum oder Geodaten?
     		return -1;

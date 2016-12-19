@@ -31,9 +31,9 @@ CREATE TABLE `userrole` (
 
 -- Passwort: a
 INSERT INTO `user` (`uuid`, `email`, `passwort`, `verifiziert`, `verifizierungsschluessel`) 
-            VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'admin_a@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 0, NULL);
+            VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', 'admin_a@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 1, NULL);
 INSERT INTO `user` (`uuid`, `email`, `passwort`, `verifiziert`, `verifizierungsschluessel`) 
-            VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'admin_b@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 0, NULL);
+            VALUES ('e26fc393-9219-44b5-b681-f08f054a79eb', 'admin_b@tehame.de', 'ypeBEsobvcr6wjGzmiPcTaeG7/gUfE5yuYB3ha/uSLs=', 1, NULL);
 INSERT INTO `role` (`id`, `name`) VALUES ('1', 'admin');
 INSERT INTO `role` (`id`, `name`) VALUES ('2', 'user');
 INSERT INTO `userrole` (`uuiduser`, `idrole`) VALUES ('e26fc393-9219-44b5-b681-f08f054a79ea', '1');

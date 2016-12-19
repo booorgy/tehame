@@ -8,7 +8,7 @@ import de.tehame.event.Event;
 public class DistanceTest {
 	
 	@Test
-	public static void distanzMessen() {
+	public void distanzMessen() {
 		Event e = new Event();
 		
 		// Etwas Abweichung ist OK

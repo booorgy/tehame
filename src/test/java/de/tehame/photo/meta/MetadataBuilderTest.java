@@ -22,7 +22,7 @@ public class MetadataBuilderTest {
 		// 2250620332 = 2041-04-26T20:18:52+00:00 in ISO 8601
 		Assert.assertEquals(2250620332L, MetadataBuilder.toUnixTimestamp("2041:04:26 20:18:52"));
 		
-		// Fehler
+		// Fehler sollen in -1 resultieren
 		Assert.assertEquals(-1L, MetadataBuilder.toUnixTimestamp("X"));
 	}
 }

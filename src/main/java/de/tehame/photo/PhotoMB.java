@@ -44,15 +44,20 @@ public class PhotoMB implements Serializable {
 	 * @return
 	 */
 	public ArrayList<String> getBilderFuerZugehoerigkeit(int zugehoerigkeit) {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		String url = request.getRequestURL().toString();
+		// Beispiel URL: http://localhost:8080/tehame/secured/photos.xhtml
+		// Beispiel URI:                      /tehame/secured/photos.xhtml
+		// Base URL:     http://localhost:8080
+		String baseURL = url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+		
 		ArrayList<String> res = new ArrayList<String>();
 		
 		ArrayList<PhotoMetadaten> metadatens = new ArrayList<PhotoMetadaten>();
 		metadatens = metadatenDB.getPhotosByUserAndZugehoerigkeit(userBean.getLoggedInUser(), zugehoerigkeit);
 		
-		for(PhotoMetadaten metadaten : metadatens) {
-			res.add(new String(TehameProperties.IMAGE_CALLBACK_URL_JSF // FIXME localhost nix gut
-					+ TehameProperties.THUMBNAIL_BUCKET + "/"
-					+ metadaten.getS3key()));
+		for (PhotoMetadaten metadaten : metadatens) {
+			res.add(baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key());
 		}
 		
 		return res;		

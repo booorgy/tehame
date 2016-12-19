@@ -25,9 +25,4 @@ public class TehameProperties {
 	 * SES: Verifizierte Absenderadresse.
 	 */
 	public static final String SES_FROM = "schinzel.benjamin@gmail.com"; 
-	
-	public static final String HTTP_SERVER_URL = "http://localhost:8080/"; // TODO ???
-	public static final String IMAGE_CALLBACK_URL_JSF = HTTP_SERVER_URL + 
-			"tehame/rest/v1/photos/www/";
-	
 }
