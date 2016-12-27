@@ -155,7 +155,7 @@ public class UserV1RS extends SecurableEndpoint {
         
         try {        
             AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient();
-            Region REGION = Region.getRegion(Regions.EU_WEST_1);
+            Region REGION = Region.getRegion(TehameProperties.SES_REGION);
             client.setRegion(REGION);
        
             client.sendEmail(request);  

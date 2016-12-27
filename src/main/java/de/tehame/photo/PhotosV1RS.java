@@ -33,7 +33,9 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import com.amazonaws.services.rekognition.model.AmazonRekognitionException;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.tehame.event.EventBean;
 import de.tehame.photo.meta.MetadataBuilder;
@@ -52,6 +54,7 @@ public class PhotosV1RS extends SecurableEndpoint {
 	@Inject private EventBean eventBean;
 	@Inject private MetadatenMongoDB metadatenDB;
 	@Inject private PhotosS3 photosS3;
+	@Inject private PhotoRekognition photoRekognition;
 
 	@GET
 	@Path("ping")
@@ -239,6 +242,17 @@ public class PhotosV1RS extends SecurableEndpoint {
 			}
 			
 			PhotoMetadaten metadaten = null;
+			
+			try {
+				this.photoRekognition.labelsVonPhoto(s3key);
+			} catch (AmazonRekognitionException e) {
+				LOGGER.error("Amazon Rekognition Fehler", e);
+				LOGGER.error("Error Message: " + e.getErrorMessage());
+				// Hier stehen Details zum Fehler in XML Form drin
+				LOGGER.error("Raw Error Message Content: " + e.getRawResponseContent());
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace(); // FIXME
+			}
 			
 			try {
 				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user, s3key);

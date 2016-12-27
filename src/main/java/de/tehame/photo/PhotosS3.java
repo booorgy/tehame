@@ -35,7 +35,7 @@ public class PhotosS3 {
 	 */
 	public String speicherePhoto(final byte[] fileData) {
 		AmazonS3Client s3 = new AmazonS3Client();
-		s3.setRegion(RegionUtils.getRegion(TehameProperties.REGION));
+		s3.setRegion(RegionUtils.getRegion(TehameProperties.REGION.getName()));
 		String bucketName = TehameProperties.PHOTO_BUCKET;
 		String key = UUID.randomUUID().toString();
 		ObjectMetadata metadata = new ObjectMetadata();
@@ -64,7 +64,7 @@ public class PhotosS3 {
 	 */
 	public byte[] ladePhoto(String bucket, String key) throws IOException, AmazonS3Exception {
 		AmazonS3Client s3 = new AmazonS3Client();
-		s3.setRegion(RegionUtils.getRegion(TehameProperties.REGION));
+		s3.setRegion(RegionUtils.getRegion(TehameProperties.REGION.getName()));
 		GetObjectRequest getRequest = new GetObjectRequest(bucket, key);
 		S3Object s3object = s3.getObject(getRequest);
 		InputStream is = s3object.getObjectContent();
