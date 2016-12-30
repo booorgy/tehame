@@ -34,6 +34,7 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.amazonaws.services.rekognition.model.AmazonRekognitionException;
+import com.amazonaws.services.rekognition.model.Label;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -243,19 +244,23 @@ public class PhotosV1RS extends SecurableEndpoint {
 			
 			PhotoMetadaten metadaten = null;
 			
+			// Wenn das Prozessieren des Fotos in Amazon Rekognition scheitert,
+			// ist das nicht so schlimm.
+			List<Label> labels = null;
+			
 			try {
-				this.photoRekognition.labelsVonPhoto(s3key);
+				labels = this.photoRekognition.labelsVonPhoto(s3key);
 			} catch (AmazonRekognitionException e) {
 				LOGGER.error("Amazon Rekognition Fehler", e);
 				LOGGER.error("Error Message: " + e.getErrorMessage());
 				// Hier stehen Details zum Fehler in XML Form drin
 				LOGGER.error("Raw Error Message Content: " + e.getRawResponseContent());
-			} catch (JsonProcessingException e1) {
-				e1.printStackTrace(); // FIXME
+			} catch (JsonProcessingException e) {
+				LOGGER.error("Fehler beim Aufruf von Rekognition", e);
 			}
 			
 			try {
-				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user, s3key);
+				metadaten = MetadataBuilder.createMetaData(fileData, zugehoerigkeit, user, s3key, labels);
 			} catch (ImageReadException e) {
 				LOGGER.error("Das Bild konnte nicht geparsed werden."); 
 				throw new WebApplicationException(e, Response.Status.BAD_REQUEST);

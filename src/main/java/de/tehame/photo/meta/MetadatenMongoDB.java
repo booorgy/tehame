@@ -69,19 +69,20 @@ public class MetadatenMongoDB implements Serializable {
 	    geoPoint[0] = metadaten.getLongitude();
 	    geoPoint[1] = metadaten.getLatitude();
 	    location.put("coordinates", geoPoint);
-	    
 	    photo.put("loc", location);
+	    
 	    if (metadaten.getAufnahmeZeitpunkt() == -1) {
 	    	Date currentDate = new Date();
 	    	photo.put("aufnahmeZeitpunkt", (currentDate.getTime() / 1000));	
 	    } else {
 	    	photo.put("aufnahmeZeitpunkt", metadaten.getAufnahmeZeitpunkt());		
 	    }
-	    photo.put("useruuid", metadaten.getUserUuid());	
+	    photo.put("useruuid", 		metadaten.getUserUuid());	
 	    photo.put("zugehoerigkeit", metadaten.getZugehoerigkeit());	
-	    photo.put("breite", metadaten.getBreite());	
-	    photo.put("hoehe", metadaten.getHoehe());
-	    photo.put("eventuuid", metadaten.getEventUuid());
+	    photo.put("breite", 		metadaten.getBreite());	
+	    photo.put("hoehe", 			metadaten.getHoehe());
+	    photo.put("eventuuid", 		metadaten.getEventUuid());
+	    photo.put("labels",			metadaten.getLabels());
 	    
 	    LOGGER.trace("Speichere Metadaten in MongoDB: " + photo.toJson());
 	    
@@ -130,7 +131,8 @@ public class MetadatenMongoDB implements Serializable {
 				(int) metadataDoc.get("hoehe"),
 				(String) metadataDoc.get("s3bucket"),
 				(String) metadataDoc.get("s3key"),
-				(int) metadataDoc.get("zugehoerigkeit"));
+				(int) metadataDoc.get("zugehoerigkeit"),
+				(String[]) metadataDoc.get("labels"));
 		
 		photoMetadaten.setEventUuid((String) metadataDoc.get("eventuuid"));
 		

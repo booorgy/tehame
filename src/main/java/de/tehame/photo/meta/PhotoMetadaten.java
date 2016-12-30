@@ -1,5 +1,10 @@
 package de.tehame.photo.meta;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.amazonaws.services.rekognition.model.Label;
+
 public class PhotoMetadaten {
 	
 	/**
@@ -53,6 +58,11 @@ public class PhotoMetadaten {
 	private final int zugehoerigkeit;
 	
 	/**
+	 * Dinge, die auf dem Photo zu sehen sind.
+	 */
+	private String[] labels = null;
+	
+	/**
 	 * @param userUuid User UUID.
 	 * @param aufnahmeZeitpunkt UNIX Timestamp der Aufnahme.
 	 * @param longitude Längengrad.
@@ -62,9 +72,11 @@ public class PhotoMetadaten {
 	 * @param s3bucket S3 Bucket Name.
 	 * @param s3key S3 Key.
 	 * @param zugehoerigkeit 0 = Privat, 1 = Familie, 2 = Freunde, 3 = Öffentlich
+	 * @param labels Amazon Rekognition Labels.
 	 */
 	public PhotoMetadaten(String userUuid, long aufnahmeZeitpunkt, double longitude, 
-			double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit) {
+			double latitude, int breite, int hoehe, String s3bucket, String s3key, int zugehoerigkeit, 
+			String[] labels) {
 		
 		this.userUuid = userUuid;
 		this.aufnahmeZeitpunkt = aufnahmeZeitpunkt;
@@ -75,6 +87,7 @@ public class PhotoMetadaten {
 		this.s3bucket = s3bucket;
 		this.s3key = s3key;
 		this.zugehoerigkeit = zugehoerigkeit;
+		this.labels = labels;
 	}
 
 	public double getLongitude() {
@@ -121,6 +134,10 @@ public class PhotoMetadaten {
 		return userUuid;
 	}
 	
+	public String[] getLabels() {
+		return this.labels;
+	}
+	
 	@Override
 	public String toString() {
 		return super.toString() 
@@ -134,6 +151,7 @@ public class PhotoMetadaten {
 				+ ", s3key=" + s3key 
 				+ ", eventUuid=" + eventUuid
 				+ ", zugehoerigkeit=" + zugehoerigkeit 
+				+ ", labels=" + Arrays.toString(labels)
 				+ "]";
 	}
 }

@@ -20,6 +20,8 @@ import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.jboss.logging.Logger;
 
+import com.amazonaws.services.rekognition.model.Label;
+
 import de.tehame.TehameProperties;
 import de.tehame.user.User;
 
@@ -33,7 +35,7 @@ public class MetadataBuilder {
 	private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-	public static PhotoMetadaten createMetaData(final byte[] fileData, int zugehoerigkeit, User user, String s3key) 
+	public static PhotoMetadaten createMetaData(final byte[] fileData, int zugehoerigkeit, User user, String s3key, List<Label> labels) 
 			throws ImageReadException, IOException {
 		
 		// -1 um nicht gesetzte ungültige Werte zu erkennen
@@ -128,9 +130,24 @@ public class MetadataBuilder {
 			}
 		}
 		
+		// Amazon Rekognition Labels als String Array umwandeln
+		String[] labelsStr = null;
+		
+		if (labels != null) {
+			labelsStr = new String[labels.size()];
+			
+			for (int i = 0; i < labels.size(); i++) {
+				labelsStr[i] = labels.get(i).getName();
+			}
+			
+		} else {
+			labelsStr = new String[0];
+		}
+		
 		final PhotoMetadaten metaDaten = new PhotoMetadaten(user.getUuid(), dateTimeOriginal, longitude, latitude, 
-				breite, hoehe, TehameProperties.PHOTO_BUCKET, s3key, zugehoerigkeit);
+				breite, hoehe, TehameProperties.PHOTO_BUCKET, s3key, zugehoerigkeit, labelsStr);
 		LOGGER.trace(metaDaten);
+		
 		return metaDaten;
 	}
 
