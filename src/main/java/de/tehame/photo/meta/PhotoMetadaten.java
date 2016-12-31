@@ -63,6 +63,11 @@ public class PhotoMetadaten {
 	private String[] labels = null;
 	
 	/**
+	 * Labels als Text.
+	 */
+	private String labelsTooltip = null;
+	
+	/**
 	 * @param userUuid User UUID.
 	 * @param aufnahmeZeitpunkt UNIX Timestamp der Aufnahme.
 	 * @param longitude Längengrad.
@@ -88,6 +93,17 @@ public class PhotoMetadaten {
 		this.s3key = s3key;
 		this.zugehoerigkeit = zugehoerigkeit;
 		this.labels = labels;
+		
+		// Konstruiere Tooltip für Fotos
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < this.labels.length; i++) {
+			sb.append(this.labels[i]);
+			
+			if (i != this.labels.length - 1) {
+				sb.append(", ");
+			}
+		}
+		this.labelsTooltip = sb.toString();
 	}
 
 	public double getLongitude() {
@@ -153,5 +169,9 @@ public class PhotoMetadaten {
 				+ ", zugehoerigkeit=" + zugehoerigkeit 
 				+ ", labels=" + Arrays.toString(labels)
 				+ "]";
+	}
+
+	public String getLabelsTooltip() {
+		return labelsTooltip;
 	}
 }

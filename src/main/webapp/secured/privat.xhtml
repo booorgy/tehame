@@ -62,11 +62,10 @@
 					</h:outputText>	
 					<br/>	
 					<hr />	
-						<ui:repeat value="#{event.photoUrls}" var="url">
-							<img class="lazy" data-src="#{url}"/>
-						</ui:repeat>									
+					<ui:repeat value="#{event.photos}" var="photo">
+						<img class="lazy" data-src="#{photo.url}" title="#{photo.metadaten.labelsTooltip}" />
+					</ui:repeat>									
 				</div>
-				<br/>	
 			</ui:repeat>						
 	</h:form>
 	

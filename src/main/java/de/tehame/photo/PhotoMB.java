@@ -89,22 +89,25 @@ public class PhotoMB implements Serializable {
 		ArrayList<Event> events = (ArrayList<Event>) eventBean.sucheEvents(users);
 		
 		for (Event event : events) {
-			ArrayList<String> photos = new ArrayList<String>();
+			ArrayList<Photo> photos = new ArrayList<Photo>();
 			metadatens = metadatenDB.getPhotosByUserAndZugehoerigkeit(
 					users, 
 					zugehoerigkeit, 
 					events.stream().map(e -> event.getUuid()).toArray(String[]::new));
 		
 			for (PhotoMetadaten metadaten : metadatens) {
-				photos.add(baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key());
+				photos.add(new Photo(
+						baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key(), 
+						metadaten, 
+						event));
 			}
-				event.setPhotoUrls(photos);					
+				event.setPhotos(photos);					
 		}
 		
 		// Nur die Events zurückgeben, welche auch Bilder haben bzw. die Zugehörigkeit passt.
 		ArrayList<Event> eventsMitBildern = new ArrayList<Event>();
 		for (Event event : events) {
-			if (event.getPhotoUrls().size() > 0)
+			if (event.getPhotos().size() > 0)
 				eventsMitBildern.add(event);
 		}
 		

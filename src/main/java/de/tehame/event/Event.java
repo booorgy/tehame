@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
+import de.tehame.photo.Photo;
 import de.tehame.photo.meta.PhotoMetadaten;
 import de.tehame.user.User;
 
@@ -97,10 +98,10 @@ public class Event implements Serializable {
 	private double radius = 0L;
 	
 	/**
-	 * Liste mit den Urls zu den Bildern des Events.
+	 * Liste mit Fotos des Events.
 	 */
 	@Transient
-	private ArrayList<String> photoUrls = new ArrayList<String>();
+	private ArrayList<Photo> photos = new ArrayList<Photo>();
 	
 	/**
 	 * Bidirektional N:N, die User zu diesem Event.
@@ -380,14 +381,12 @@ public class Event implements Serializable {
 			return false;
 		return true;
 	}
-
-	public ArrayList<String> getPhotoUrls() {
-		return photoUrls;
+	
+	public ArrayList<Photo> getPhotos() {
+		return photos;
 	}
 
-	public void setPhotoUrls(ArrayList<String> photoUrls) {
-		this.photoUrls = photoUrls;
+	public void setPhotos(ArrayList<Photo> photos) {
+		this.photos = photos;
 	}
-	
-	
 }

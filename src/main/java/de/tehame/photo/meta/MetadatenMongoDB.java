@@ -116,11 +116,47 @@ public class MetadatenMongoDB implements Serializable {
 		
 		return result;
 	}
-
+	
 	private PhotoMetadaten ladeMetadaten(DBCursor cursor) {
+		/* Beispiel JSON:
+			{
+			    "_id" : ObjectId("58679fac49293e15f8812613"),
+			    "s3key" : "cbeaa59f-da9b-414f-b2e6-a17a617c1e89",
+			    "s3bucket" : "tehame-ireland",
+			    "loc" : {
+			        "type" : "Point",
+			        "coordinates" : [ 
+			            -1.0, 
+			            -1.0
+			        ]
+			    },
+			    "aufnahmeZeitpunkt" : NumberLong(1483186092),
+			    "useruuid" : "e26fc393-9219-44b5-b681-f08f054a79ea",
+			    "zugehoerigkeit" : 2,
+			    "breite" : -1,
+			    "hoehe" : -1,
+			    "eventuuid" : "9f33df8d-0c7a-40d1-b913-b526fbfa59ac",
+			    "labels" : [ 
+			        "People", 
+			        "Person", 
+			        "Human", 
+			        "Chair", 
+			        "Furniture", 
+			        "Dinner", 
+			        "Food", 
+			        "Meal", 
+			        "Supper"
+			    ]
+			}
+		*/
+		
 		DBObject metadataDoc = cursor.next();
+		
 		DBObject geoJsonDoc = (DBObject) metadataDoc.get("loc");
+		BasicDBList labels = (BasicDBList) metadataDoc.get("labels");
+		
 		BasicDBList coordinates = (BasicDBList) geoJsonDoc.get("coordinates");
+		
 		
 		PhotoMetadaten photoMetadaten = new PhotoMetadaten(
 				(String) metadataDoc.get("useruuid"),
@@ -132,7 +168,7 @@ public class MetadatenMongoDB implements Serializable {
 				(String) metadataDoc.get("s3bucket"),
 				(String) metadataDoc.get("s3key"),
 				(int) metadataDoc.get("zugehoerigkeit"),
-				(String[]) metadataDoc.get("labels"));
+				labels.toArray(new String[labels.size()]));
 		
 		photoMetadaten.setEventUuid((String) metadataDoc.get("eventuuid"));
 		
