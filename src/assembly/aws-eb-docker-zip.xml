@@ -8,7 +8,7 @@
 	</formats>
 
 	<includeBaseDirectory>false</includeBaseDirectory>
-
+	
 	<files>
 		<file>
 			<source>${project.build.directory}/${project.name}.war</source>
@@ -21,6 +21,10 @@
 		</file>
 		<file>
 			<source>${project.basedir}/docker/Dockerfile</source>
+		</file>
+		<file>
+			<source>${project.basedir}/docker/nginx.config</source>
+			<outputDirectory>.ebextensions</outputDirectory>
 		</file>
 	</files>
 </assembly> 
