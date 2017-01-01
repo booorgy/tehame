@@ -2,12 +2,14 @@ package de.tehame.event;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 
 import de.tehame.photo.Photo;
@@ -62,9 +64,21 @@ public class Event implements Serializable {
 	private long begins = -1L;
 	
 	/**
+	 * Für die Darstellung im Frontend.
+	 */
+	@Transient
+	private Date beginsDate = null;
+	
+	/**
 	 * Das jüngste Photo bestimmt diesen UNIX Timestamp.
 	 */
 	private long ends = -1L;
+	
+	/**
+	 * Für die Darstellung im Frontend.
+	 */
+	@Transient
+	private Date endsDate = null;
 	
 	/**
 	 * Die Summe aller Längengrade. Wird benötigt um den Mittelpunkt zu berechnen.
@@ -135,10 +149,33 @@ public class Event implements Serializable {
 		this.longitudeSum = metadaten.getLongitude();
 		this.anzahlPhotos = 1;
 		this.radius = RADIUS_INITIAL_METER;
-		this.ends = metadaten.getAufnahmeZeitpunkt() + DIFFERENZ_SEKUNDEN;
-		this.begins = metadaten.getAufnahmeZeitpunkt() - DIFFERENZ_SEKUNDEN;
+		
+		// Nur, wenn für die Metadaten ein Zeitpunkt bekannt ist, 
+		// wird der Zeitraum dieses neuen Events bei Bedarf erweitert.
+		if (metadaten.getAufnahmeZeitpunkt() != -1L) {
+			this.ends = metadaten.getAufnahmeZeitpunkt() + DIFFERENZ_SEKUNDEN;
+			this.begins = metadaten.getAufnahmeZeitpunkt() - DIFFERENZ_SEKUNDEN;
+		} else {
+			this.ends = -1L;
+			this.begins = -1L;
+		}
+		
+		this.updateDatumFuerFrontend();
 	}
 	
+	/**
+	 * JPA Entity Lifecycle Methode.
+	 */
+	@PostLoad
+	public void init() {
+		this.updateDatumFuerFrontend();
+	}
+	
+	private void updateDatumFuerFrontend() {
+		this.endsDate = new Date(this.ends);
+		this.beginsDate = new Date(this.begins);
+	}
+
 	public void berechneNeuenMittelpunkt(PhotoMetadaten metadaten) {
 		this.latitudeSum += metadaten.getLatitude();
 		this.longitudeSum += metadaten.getLongitude();
@@ -153,13 +190,14 @@ public class Event implements Serializable {
 	 */
 	protected double berechneDistanzZumMittelpunkt(PhotoMetadaten metadaten) {
 		final double distanz = this.haversine(
-				/* Koordinate 1 */ metadaten.getLatitude(), metadaten.getLongitude(), 
-				/* Koordinate 2 */ this.getLatitudeCenter(), this.getLongitudeCenter());
+				/* Koordinate 1 */ metadaten.getLongitude(), metadaten.getLatitude(), 
+				/* Koordinate 2 */ this.getLongitudeCenter(), this.getLatitudeCenter());
 		return distanz;
 	}
 	
 	/**
-	 * Quelle: http://stackoverflow.com/questions/18861728/calculating-distance-between-two-points-represented-by-lat-long-upto-15-feet-acc
+	 * Quelle1: http://stackoverflow.com/questions/18861728/calculating-distance-between-two-points-represented-by-lat-long-upto-15-feet-acc
+	 * Quelle2: http://www.movable-type.co.uk/scripts/latlong.html
 	 * 
 	 * Weitere Infos zum Thema:
 	 * Google verwendet vermutlich WGS84 als Koordinaten Referenz System (wie GPS):
@@ -176,21 +214,23 @@ public class Event implements Serializable {
 	 * http://mapserver.org/ogc/wms_server.html#coordinate-systems-and-axis-orientation
 	 * "CRS:84 (WGS 84 longitude-latitude)"
 	 * 
-	 * @param lat1 Latitude 1 in Grad.
 	 * @param lng1 Longitude 1 in Grad.
-	 * @param lat2 Latitude 2 in Grad.
+	 * @param lat1 Latitude 1 in Grad.
 	 * @param lng2 Longitude 2 in Grad.
+	 * @param lat2 Latitude 2 in Grad.
 	 * 
 	 * @return Distanz in Metern.
 	 */
-	protected double haversine(double lat1, double lng1, double lat2, double lng2) {
-	    int r = 6371 * 1000; // Durchschnittlicher Radius der Erde in Metern
+	protected double haversine(double lng1, double lat1, double lng2, double lat2) {
+	    double r = 6371 * 1000; // Durchschnittlicher Radius der Erde in Metern
+	    double dLng = Math.toRadians(lng2 - lng1);
 	    double dLat = Math.toRadians(lat2 - lat1);
-	    double dLon = Math.toRadians(lng2 - lng1);
-	    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-	       Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) 
-	      * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	    double a =
+	    		Math.sin(dLng / 2d) * Math.sin(dLng / 2d) // sin²(dLng/2)
+	    		+
+	    		Math.cos(Math.toRadians(lng1)) * Math.cos(Math.toRadians(lng2)) 
+	    		* Math.sin(dLat / 2d) * Math.sin(dLat / 2d); // sin²(dLat/2)
+	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1d - a));
 	    double d = r * c;
 	    return d;
 	}
@@ -218,12 +258,16 @@ public class Event implements Serializable {
 	 * @param metadaten Photo Metadaten.
 	 */
 	protected void erweitereZeitlichenRahmen(final PhotoMetadaten metadaten) {
-		if (metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN < this.getBegins()) {
-			this.setBegins(metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN);
-		}
 		
-		if (metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN > this.getEnds()) {
-			this.setEnds(metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN);
+		// Nur wenn ein Zeitpunkt bekannt ist
+		if (this.begins != -1) {
+			if (metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN < this.getBegins()) {
+				this.setBegins(metadaten.getAufnahmeZeitpunkt() - Event.DIFFERENZ_SEKUNDEN);
+			}
+			
+			if (metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN > this.getEnds()) {
+				this.setEnds(metadaten.getAufnahmeZeitpunkt() + Event.DIFFERENZ_SEKUNDEN);
+			}
 		}
 	}
 	
@@ -237,6 +281,14 @@ public class Event implements Serializable {
 	 * @return Ob der Aufnahmezeitpunkt zu diesem Event passt.
 	 */
 	protected boolean istZeitlichPassend(PhotoMetadaten metadaten) {
+		
+		// Wenn dieses Event keinen bekannten Zeitpunkt hat und die Metadaten auch nicht,
+		// dann ist eine Zuordnung möglich
+		if (this.begins == -1 && metadaten.getAufnahmeZeitpunkt() == -1) {
+			return true;
+		}
+		
+		// Ansonsten prüfe den Bereich
 		return metadaten.getAufnahmeZeitpunkt() > this.getBegins() - Event.DIFFERENZ_SEKUNDEN 
 				&& metadaten.getAufnahmeZeitpunkt() < this.getEnds() + Event.DIFFERENZ_SEKUNDEN;
 	}
@@ -388,5 +440,13 @@ public class Event implements Serializable {
 
 	public void setPhotos(ArrayList<Photo> photos) {
 		this.photos = photos;
+	}
+	
+	public Date getBeginsDate() {
+		return beginsDate;
+	}
+
+	public Date getEndsDate() {
+		return endsDate;
 	}
 }

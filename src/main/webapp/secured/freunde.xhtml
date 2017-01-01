@@ -49,23 +49,24 @@
 		</table>		
 	</h:form>
 	<h:form>
-			<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(2)}" var="event">
-				<div class="eventContainer">
-					Start : 
-					<h:outputText value="#{event.begins}" >
-						<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" timeZone="CET"/>
+		<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(2)}" var="event">
+			<div class="eventContainer">
+				<c:if test="#{event.begins == -1}">
+					<h:outputText value="#{event.beginsDate}" >
+						<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
 					</h:outputText>					
-					Ende : 		
-					<h:outputText value="#{event.ends}" >
-						<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" timeZone="CET"/>
+					- 		
+					<h:outputText value="#{event.endsDate}" >
+						<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
 					</h:outputText>	
 					<br/>	
-					<hr />	
-					<ui:repeat value="#{event.photos}" var="photo">
-						<img class="lazy" data-src="#{photo.url}" title="#{photo.metadaten.labelsTooltip}" />
-					</ui:repeat>									
-				</div>
-			</ui:repeat>						
+					<hr />
+				</c:if>	
+				<ui:repeat value="#{event.photos}" var="photo">
+					<img class="lazy" data-src="#{photo.url}" title="#{photo.metadaten.labelsTooltip}" />
+				</ui:repeat>									
+			</div>
+		</ui:repeat>						
 	</h:form>
 </h:body>
 </html>

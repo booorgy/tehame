@@ -25,5 +25,8 @@ public class DistanceTest {
 		// Long: Von Minus nach Plus
 		// https://www.google.de/maps/dir/-0.011022,29.7630183/0.0328065,29.7595163/@0.0109914,29.7675027,14.06z
 		Assert.assertEquals(4900d, e.haversine(-0.011022, 29.7630183, 0.0328065, 29.7595163), 4900d * delta);
+		
+		// https://www.google.de/maps/dir/50.0521,8.248486/50.0520346,8.2520558/@50.0520652,8.2492474,18z/data=!3m1!4b1!4m2!4m1!3e0
+		Assert.assertEquals(250d, e.haversine(50.0521, 8.248486, 50.052034, 8.2520558), 250d * delta);
 	}
 }

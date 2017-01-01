@@ -15,10 +15,12 @@ public class EventV1RSIT {
 		ClientRequest request = new ClientRequest("http://localhost:8080/tehame/rest/v1/event");
 		request.header("email", "admin_a@tehame.de");
 		request.header("passwort", "a");
+		request.header("zugehoerigkeit", 2); // Freunde
 		ClientResponse<String> response = request.get(String.class);
 		Assert.assertEquals(200, response.getStatus());
 		// Admin A sieht sein eigenes Event und das eine Event seines Freundes Admin B
-		Assert.assertTrue(response.getEntity().equals(
-				"[\"e26fc393-9219-44b5-b681-f08f054a79ex\",\"e26fc393-9219-44b5-b681-f08f054a79ey\"]"));
+		Assert.assertEquals("Wenn die Testdatenbank verwendet wird, sollte der User Zugriff auf 2 Events haben", 
+				"[\"e26fc393-9219-44b5-b681-f08f054a79ex\",\"e26fc393-9219-44b5-b681-f08f054a79ey\"]", 
+				response.getEntity());
 	}
 }
