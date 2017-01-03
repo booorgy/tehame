@@ -50,19 +50,24 @@
 	</h:form>
 	<h:form>
 	<h:form>
-		<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(2)}" var="event">
+		<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(0)}" var="event">
 			<div class="eventContainer">
-				<h:outputText value="#{event.beginsDate}" >
-					<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
-				</h:outputText>					
-				- 		
-				<h:outputText value="#{event.endsDate}" >
-					<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
-				</h:outputText>	
-				<br/>	
-				<hr />	
+				<c:if test="#{event.begins != -1}">
+					Zeitpunkt unbekannt
+					<hr />
+				</c:if>	
+				<c:if test="#{event.begins == -1}">
+					<h:outputText value="#{event.beginsDate}" >
+						<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
+					</h:outputText>					
+					- 		
+					<h:outputText value="#{event.endsDate}" >
+						<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
+					</h:outputText>	
+					<hr />
+				</c:if>
 				<ui:repeat value="#{event.photos}" var="photo">
-					<img class="lazy" data-src="#{photo.url}" title="#{photo.metadaten.labelsTooltip}" />
+					<img class="lazy" data-src="#{photo.thumbnailUrl}" title="#{photo.metadaten.labelsTooltip}" onclick="window.open('#{photo.photoUrl}');" />
 				</ui:repeat>									
 			</div>
 		</ui:repeat>							

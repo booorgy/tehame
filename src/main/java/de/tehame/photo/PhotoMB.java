@@ -98,6 +98,7 @@ public class PhotoMB implements Serializable {
 			for (PhotoMetadaten metadaten : metadatens) {
 				photos.add(new Photo(
 						baseURL + "rest/v1/photos/www/" + TehameProperties.THUMBNAIL_BUCKET + "/" + metadaten.getS3key(), 
+						baseURL + "rest/v1/photos/www/" + TehameProperties.PHOTO_BUCKET + "/" + metadaten.getS3key(),
 						metadaten, 
 						event));
 			}
