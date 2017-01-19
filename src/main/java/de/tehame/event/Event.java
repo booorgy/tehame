@@ -172,8 +172,8 @@ public class Event implements Serializable {
 	}
 	
 	private void updateDatumFuerFrontend() {
-		this.endsDate = new Date(this.ends);
-		this.beginsDate = new Date(this.begins);
+		this.endsDate = new Date(this.ends * 1000);
+		this.beginsDate = new Date(this.begins * 1000);
 	}
 
 	public void berechneNeuenMittelpunkt(PhotoMetadaten metadaten) {

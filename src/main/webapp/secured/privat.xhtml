@@ -52,11 +52,11 @@
 	<h:form>
 		<ui:repeat value="#{photoMB.getEventsFuerZugehoerigkeit(0)}" var="event">
 			<div class="eventContainer">
-				<c:if test="#{event.begins != -1}">
+				<c:if test="#{event.begins == -1}">
 					Zeitpunkt unbekannt
 					<hr />
 				</c:if>	
-				<c:if test="#{event.begins == -1}">
+				<c:if test="#{event.begins != -1}">
 					<h:outputText value="#{event.beginsDate}" >
 						<f:convertDateTime type="both" timeStyle="full" dateType="full" timeZone="CET" locale="de_DE" />
 					</h:outputText>					

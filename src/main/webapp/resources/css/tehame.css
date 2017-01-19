@@ -7,4 +7,5 @@ div.thumbnail {
 div.eventContainer {
 	background-color: lightblue;
 	border:2px solid black;
+	margin-top: 10px;
 }
