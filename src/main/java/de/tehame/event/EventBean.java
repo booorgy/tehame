@@ -43,7 +43,7 @@ public class EventBean {
 		// Muss absteigend sortiert sein, damit Photos korrekt zugeordnet werden,
 		// d.h. dem neusten passenden Event zugeordnet werden, falls mehrere passen würden
 		TypedQuery<Event> query = this.em.createQuery(
-				"SELECT e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids ORDER BY e.ends DESC", 
+				"SELECT distinct e FROM event AS e INNER JOIN e.users AS u WHERE u.uuid IN :useruuids ORDER BY e.ends DESC", 
 				Event.class)
 				.setParameter("useruuids", uuids);
 		List<Event> events = query.getResultList();
